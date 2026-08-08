@@ -1,0 +1,5 @@
+{
+  "extends": "@flex-state/tsconfig/base.json",
+  "compilerOptions": { "noEmit": true },
+  "include": ["src"]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "flex-state-monorepo",
+  "private": true,
+  "packageManager": "pnpm@11.20.0",
+  "engines": {
+    "node": ">=22.12"
+  },
+  "scripts": {
+    "dev": "turbo run tauri:dev --filter=@flex-state/desktop",
+    "build": "turbo run build",
+    "desktop:build": "turbo run tauri:build --filter=@flex-state/desktop",
+    "check": "turbo run check",
+    "test": "turbo run test",
+    "lint": "biome check .",
+    "format": "biome check --write ."
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.5.7",
+    "turbo": "^2.10.9"
+  }
+}
