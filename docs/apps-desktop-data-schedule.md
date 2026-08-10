@@ -1,8 +1,8 @@
 ---
 id: apps-desktop-data-schedule
 source: apps/desktop/src/data/schedule.ts, apps/desktop/src/data/schedule.test.ts, apps/desktop/package.json, apps/desktop/tsconfig.json
-updated: 2026-08-09
-depends_on: [apps-desktop-data-exercises]
+updated: 2026-08-10
+depends_on: [apps-desktop-data-exercises, apps-desktop-data-locations]
 status: current
 ---
 
@@ -12,7 +12,7 @@ Defines the versioned offline personalization profile, deterministic weekly-plan
 ## Contract
 
 ```ts
-export const PERSONALIZATION_GENERATOR_VERSION = 1 as const;
+export const PERSONALIZATION_GENERATOR_VERSION = 2 as const;
 export type TrainingGoal = "general_fitness" | "strength" | "conditioning" | "mobility_balance";
 export type DaysPerWeek = 2 | 3 | 4 | 5 | 6 | 7;
 export type SessionMinutes = 15 | 30 | 45;
@@ -24,9 +24,8 @@ export interface PersonalizationProfile {
   experience: Difficulty;
   daysPerWeek: DaysPerWeek;
   sessionMinutes: SessionMinutes;
-  hasDumbbells: boolean;
   lowImpactOnly: boolean;
-  excludedExerciseSlugs: string[];
+  locationId: string;
 }
 
 export type Prescription =
@@ -66,11 +65,23 @@ export interface WeeklyPlan {
 }
 
 export interface PlanGenerationIssue {
-  code: "invalid_profile" | "missing_catalog_exercise" | "insufficient_eligible_exercises";
+  code:
+    | "invalid_profile"
+    | "missing_catalog_exercise"
+    | "insufficient_eligible_exercises"
+    | "location_missing";
   message: string;
   day?: number;
   focus?: PlanFocus;
   slug?: string;
+  locationId?: string;
+}
+
+export interface FocusReadiness {
+  focus: PlanFocus;
+  label: string;
+  eligible: number;
+  missing: EquipmentKind[];
 }
 
 export type PlanGenerationResult =
@@ -88,27 +99,32 @@ export function isWeeklyPlan(value: unknown): value is WeeklyPlan;
 export function generateWeeklyPlan(
   profile: PersonalizationProfile,
   catalog: Exercise[],
+  locations: Location[],
 ): PlanGenerationResult;
+export function locationReadiness(location: Location, catalog: Exercise[]): FocusReadiness[];
 export function resolvePlan(plan: WeeklyPlan, catalog: Exercise[]): ResolvedPlan;
 export function formatPrescription(prescription: Prescription): string;
 export function sessionDurationSec(session: WorkoutSession): number;
 ```
 
-`apps/desktop/package.json` exposes `pnpm --filter @flex-state/desktop test`. The script runs `schedule.test.ts` with Node's type stripping and `node:test`; the desktop TypeScript configuration excludes `*.test.ts` because the browser build does not load Node type declarations.
+`apps/desktop/package.json` exposes `pnpm --filter @flex-state/desktop test`. The script runs `schedule.test.ts`, `locations.test.ts`, and `exercises.test.ts` with Node's type stripping and `node:test`; the desktop TypeScript configuration excludes `*.test.ts` because the browser build does not load Node type declarations.
 
 ## Behavior
-1. `generateWeeklyPlan()` validates the complete profile and returns one `invalid_profile` issue for any invalid value or duplicate exclusion.
-2. Generation validates every candidate slug needed by the selected focus cycle before applying profile filters and reports unique catalog gaps in candidate order.
-3. Difficulty, dumbbell-only equipment, high impact, and exact-slug exclusions are hard filters for warmups and main exercises.
-4. Each session uses the first two eligible warmups and at least two unique main exercises, preferring main slugs not used earlier in the week.
-5. The generator adds later main candidates only while the estimated session remains within the requested duration; the mandatory first two may exceed it.
-6. Rep estimates use three seconds per repetition and 45 seconds between sets. Timed estimates use the prescribed seconds and 30 seconds between sets. Per-side work doubles work time but not rest.
-7. Duration warnings record sessions below 80 percent or above 110 percent of the requested duration. Unknown exclusions produce warnings and do not prevent generation.
-8. `resolvePlan()` maps a saved snapshot to the live catalog and reports unique missing slugs without changing the plan.
-9. Generation uses ordered pools and no randomness, clock, network, account, or AI service.
+1. `generateWeeklyPlan()` validates the complete profile and returns one `invalid_profile` issue for any invalid value.
+2. Generation resolves `profile.locationId` against the `locations` argument and returns one `location_missing` issue carrying that id when nothing matches.
+3. Generation validates every candidate slug needed by the selected focus cycle before applying profile filters and reports unique catalog gaps in candidate order.
+4. Difficulty, equipment, high impact, and exact-slug exclusions are hard filters for warmups and main exercises. Equipment passes when `equipmentCovers(location.equipment, exercise.requires)` holds; exclusions come from `location.excludedExerciseSlugs`, not from the profile.
+5. Each session uses the first two eligible warmups and at least two unique main exercises, preferring main slugs not used earlier in the week.
+6. The generator adds later main candidates only while the estimated session remains within the requested duration; the mandatory first two may exceed it.
+7. Rep estimates use three seconds per repetition and 45 seconds between sets. Timed estimates use the prescribed seconds and 30 seconds between sets. Per-side work doubles work time but not rest.
+8. Duration warnings record sessions below 80 percent or above 110 percent of the requested duration. Unknown exclusions produce warnings and do not prevent generation.
+9. `resolvePlan()` maps a saved snapshot to the live catalog and reports unique missing slugs without changing the plan.
+10. An `insufficient_eligible_exercises` message always ends with `Change exclusions or profile constraints.` and appends ` Add <labels> at <location name>, or pick another place.` when the focus pool needs equipment the location lacks.
+11. `locationReadiness()` returns one entry per `PlanFocus` counting the pool candidates that pass the equipment and exclusion filters at that location, plus the kinds the location is missing. It ignores difficulty and impact.
+12. Generation uses ordered pools and no randomness, clock, network, account, or AI service.
 
 ## Invariants
-- Generator version `1` is embedded in every valid snapshot.
+- Generator version `2` is embedded in every valid snapshot.
 - Identical profile and catalog inputs produce deeply equal plan objects.
 - A main slug occurs at most once in a session.
 - Filters are never relaxed to satisfy exercise count or duration.
@@ -116,12 +132,16 @@ export function sessionDurationSec(session: WorkoutSession): number;
 - Candidate impact is explicit planner metadata and is not inferred from exercise names.
 
 ## Gotchas
-- Catalog records with equipment `both` remain eligible when `hasDumbbells` is false because they support bodyweight use.
+- The v1 boolean maps onto locations exactly: `hasDumbbells: true` is `["bodyweight", "furniture", "dumbbells", "floor"]` and `hasDumbbells: false` is `["bodyweight", "furniture", "floor"]`. `schedule.test.ts` asserts both rows.
+- A location without `floor` leaves the `core` pool with one eligible exercise (`wall-crunch`), so the `general_fitness` and `conditioning` goals cannot generate there at all. Without `dumbbells` as well, `upper` starves too. This is correct and unavoidable; `LocationManager`'s readiness line exists so the user sees it before hitting Save.
+- `mobility_balance` is the one goal that generates on `["bodyweight"]` alone: every non-chair-assisted mobility exercise is standing.
+- An exercise with an empty `requires` would be eligible everywhere, because `[].every(...)` is `true`. No catalog record has one; every record requires `bodyweight`.
 - Removing a planner candidate from the catalog prevents generation; removing only an excluded slug produces `unknown_exclusion`.
 - A warmup slug may also appear in the same session's main pool because warmup use does not count as main-work reuse.
-- Tests use explicit `.ts` import extensions for Node execution and are intentionally outside the browser TypeScript project.
+- `schedule.ts` and its tests use explicit `.ts` import extensions so `node --experimental-strip-types` resolves them; `apps/desktop/tsconfig.json` sets `allowImportingTsExtensions` for that reason. The tests stay outside the browser TypeScript project.
 
 ## Related
 [[apps-desktop-data-exercises]]
+[[apps-desktop-data-locations]]
 [[apps-desktop-data-db]]
 [[apps-desktop-personalized-plan]]

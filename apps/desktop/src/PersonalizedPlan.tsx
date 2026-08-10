@@ -2,7 +2,8 @@ import { Button } from "@flex-state/ui";
 import type { CSSProperties, FormEvent } from "react";
 import * as React from "react";
 import type { SavedPersonalization } from "./data/db";
-import type { Category, Exercise } from "./data/exercises";
+import { EQUIPMENT_LABELS, type Exercise } from "./data/exercises";
+import type { Location } from "./data/locations";
 import {
   type DaysPerWeek,
   formatPrescription,
@@ -15,31 +16,34 @@ import {
 } from "./data/schedule";
 
 export interface ProfileFormProps {
-  categories: Category[];
-  catalog: Exercise[];
+  locations: Location[];
   initialProfile?: PersonalizationProfile;
   submitLabel: "Save plan" | "Regenerate plan";
   saving: boolean;
   error: string | null;
-  onSubmit: (profile: PersonalizationProfile) => Promise<void>;
+  onSubmit: (profile: PersonalizationProfile) => Promise<unknown>;
+  onManageLocations: () => void;
   onCancel?: () => void;
 }
 
 export interface PlanViewProps {
   saved: SavedPersonalization;
   catalog: Exercise[];
+  locations: Location[];
   onEdit: () => void;
   onRegenerate: () => void;
+  onSwitchLocation: (locationId: string) => void;
+  saving: boolean;
 }
 
-const DEFAULT_PROFILE: PersonalizationProfile = {
+// No `locationId`: there is no default location to name. The form takes the
+// first user-created one, and App never renders it with an empty list.
+const DEFAULT_PROFILE: Omit<PersonalizationProfile, "locationId"> = {
   primaryGoal: "general_fitness",
   experience: "beginner",
   daysPerWeek: 3,
   sessionMinutes: 15,
-  hasDumbbells: false,
   lowImpactOnly: false,
-  excludedExerciseSlugs: [],
 };
 
 const GOAL_LABELS: Record<TrainingGoal, string> = {
@@ -141,31 +145,20 @@ const styles: Record<string, CSSProperties> = {
 };
 
 export function ProfileForm({
-  categories,
-  catalog,
+  locations,
   initialProfile,
   submitLabel,
   saving,
   error,
   onSubmit,
+  onManageLocations,
   onCancel,
 }: ProfileFormProps): React.JSX.Element {
-  const [profile, setProfile] = React.useState<PersonalizationProfile>(() => {
-    const source = initialProfile ?? DEFAULT_PROFILE;
-    return { ...source, excludedExerciseSlugs: [...source.excludedExerciseSlugs] };
-  });
-  const [search, setSearch] = React.useState("");
+  const [profile, setProfile] = React.useState<PersonalizationProfile>(() => ({
+    ...(initialProfile ?? DEFAULT_PROFILE),
+    locationId: initialProfile?.locationId ?? (locations[0] as Location).id,
+  }));
   const [validationError, setValidationError] = React.useState<string | null>(null);
-  const query = search.trim().toLocaleLowerCase();
-  const visibleCatalog = query
-    ? catalog.filter(
-        (exercise) =>
-          exercise.name.toLocaleLowerCase().includes(query) ||
-          exercise.slug.toLocaleLowerCase().includes(query),
-      )
-    : catalog;
-  const catalogSlugs = new Set(catalog.map((exercise) => exercise.slug));
-  const unknownExclusions = profile.excludedExerciseSlugs.filter((slug) => !catalogSlugs.has(slug));
 
   async function submit(event: FormEvent<HTMLFormElement>): Promise<void> {
     event.preventDefault();
@@ -262,16 +255,22 @@ export function ProfileForm({
               ))}
             </select>
           </label>
+          <label style={styles.field}>
+            Location
+            <select
+              style={styles.select}
+              value={profile.locationId}
+              onChange={(event) => setProfile({ ...profile, locationId: event.target.value })}
+            >
+              {locations.map((location) => (
+                <option key={location.id} value={location.id}>
+                  {location.name}
+                </option>
+              ))}
+            </select>
+          </label>
         </div>
 
-        <label style={styles.checkbox}>
-          <input
-            type="checkbox"
-            checked={profile.hasDumbbells}
-            onChange={(event) => setProfile({ ...profile, hasDumbbells: event.target.checked })}
-          />
-          I have 5 kg dumbbells
-        </label>
         <label style={styles.checkbox}>
           <input
             type="checkbox"
@@ -281,75 +280,6 @@ export function ProfileForm({
           Low impact only
         </label>
 
-        <details style={styles.fieldset}>
-          <summary>Exclude exercises (optional)</summary>
-          <label style={{ ...styles.field, marginTop: "0.75rem" }}>
-            Search exercises
-            <input
-              type="search"
-              style={styles.input}
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-          </label>
-          {categories.map((category) => {
-            const exercises = visibleCatalog.filter(
-              (exercise) => exercise.categorySlug === category.slug,
-            );
-            return exercises.length > 0 ? (
-              <div key={category.slug}>
-                <h3 style={{ marginBottom: "0.35rem", fontSize: "1rem" }}>{category.name}</h3>
-                <div style={styles.checklist}>
-                  {exercises.map((exercise) => (
-                    <label key={exercise.slug} style={styles.checkbox}>
-                      <input
-                        type="checkbox"
-                        checked={profile.excludedExerciseSlugs.includes(exercise.slug)}
-                        onChange={(event) =>
-                          setProfile({
-                            ...profile,
-                            excludedExerciseSlugs: event.target.checked
-                              ? [...profile.excludedExerciseSlugs, exercise.slug]
-                              : profile.excludedExerciseSlugs.filter(
-                                  (slug) => slug !== exercise.slug,
-                                ),
-                          })
-                        }
-                      />
-                      {exercise.name}
-                    </label>
-                  ))}
-                </div>
-              </div>
-            ) : null;
-          })}
-          {visibleCatalog.length === 0 ? (
-            <p style={styles.meta}>No exercises match that search.</p>
-          ) : null}
-          {unknownExclusions.length > 0 ? (
-            <div>
-              <h3 style={{ marginBottom: "0.35rem", fontSize: "1rem" }}>No longer in catalog</h3>
-              {unknownExclusions.map((slug) => (
-                <label key={slug} style={styles.checkbox}>
-                  <input
-                    type="checkbox"
-                    checked
-                    onChange={() =>
-                      setProfile({
-                        ...profile,
-                        excludedExerciseSlugs: profile.excludedExerciseSlugs.filter(
-                          (excluded) => excluded !== slug,
-                        ),
-                      })
-                    }
-                  />
-                  {slug}
-                </label>
-              ))}
-            </div>
-          ) : null}
-        </details>
-
         {validationError || error ? (
           <div role="alert" style={styles.error}>
             {validationError ?? error}
@@ -358,6 +288,9 @@ export function ProfileForm({
         <div style={styles.actions}>
           <Button type="submit" disabled={saving}>
             {saving ? "Saving..." : submitLabel}
+          </Button>
+          <Button type="button" onClick={onManageLocations} disabled={saving}>
+            Manage locations
           </Button>
           {onCancel ? (
             <Button type="button" onClick={onCancel} disabled={saving}>
@@ -382,7 +315,8 @@ function PlanExercise({
       <strong>{exercise.name}</strong>
       <div>{formatPrescription(item.prescription)}</div>
       <div style={styles.meta}>
-        {exercise.equipment} · {exercise.difficulty} · {exercise.primaryMuscles.join(", ")}
+        {exercise.requires.map((kind) => EQUIPMENT_LABELS[kind]).join(" · ")} ·{" "}
+        {exercise.difficulty} · {exercise.primaryMuscles.join(", ")}
       </div>
       {item.notes ? <div style={{ marginTop: "0.25rem" }}>{item.notes}</div> : null}
     </div>
@@ -392,11 +326,16 @@ function PlanExercise({
 export function PlanView({
   saved,
   catalog,
+  locations,
   onEdit,
   onRegenerate,
+  onSwitchLocation,
+  saving,
 }: PlanViewProps): React.JSX.Element {
   const resolved = resolvePlan(saved.plan, catalog);
   const profile = saved.profile;
+  const locationName =
+    locations.find((location) => location.id === profile.locationId)?.name ?? profile.locationId;
 
   return (
     <section style={styles.wrap}>
@@ -405,6 +344,23 @@ export function PlanView({
           <h2 style={{ marginBottom: "0.25rem" }}>{saved.plan.name}</h2>
           <div style={styles.meta}>Generated {new Date(saved.generatedAt).toLocaleString()}</div>
         </div>
+        {/* Switching regenerates and saves in place, so the plan is never stale
+            relative to the selection. */}
+        <label style={styles.field}>
+          Location
+          <select
+            style={styles.select}
+            value={profile.locationId}
+            disabled={saving}
+            onChange={(event) => onSwitchLocation(event.target.value)}
+          >
+            {locations.map((location) => (
+              <option key={location.id} value={location.id}>
+                {location.name}
+              </option>
+            ))}
+          </select>
+        </label>
         <Button onClick={onEdit}>Edit profile</Button>
       </div>
 
@@ -426,7 +382,7 @@ export function PlanView({
         <div style={styles.summaryItem}>
           <strong>Constraints</strong>
           <div>
-            {profile.hasDumbbells ? "Dumbbells available" : "Bodyweight only"}
+            {locationName}
             {profile.lowImpactOnly ? " · Low impact" : ""}
           </div>
         </div>

@@ -1,6 +1,13 @@
 import type { CSSProperties } from "react";
 import * as React from "react";
-import type { Category, Equipment, Exercise, SourceRef } from "./data/exercises";
+import {
+  type Category,
+  EQUIPMENT_KINDS,
+  EQUIPMENT_LABELS,
+  type EquipmentKind,
+  type Exercise,
+  type SourceRef,
+} from "./data/exercises";
 
 const styles: Record<string, CSSProperties> = {
   wrap: {
@@ -78,19 +85,7 @@ const DIFFICULTY_COLOR: Record<Exercise["difficulty"], string> = {
   advanced: "#f87171",
 };
 
-const EQUIPMENT_LABEL: Record<Equipment, string> = {
-  bodyweight: "Bodyweight",
-  dumbbells: "5 kg DBs",
-  both: "Bodyweight + DBs",
-};
-
-const EQUIPMENT_COLOR: Record<Equipment, string> = {
-  bodyweight: "#93c5fd",
-  dumbbells: "#fdba74",
-  both: "#c4b5fd",
-};
-
-type EquipmentFilter = Equipment | "all";
+type EquipmentFilter = EquipmentKind | "all";
 type DifficultyFilter = "all" | "beginner" | "intermediate" | "advanced";
 
 interface Props {
@@ -106,10 +101,7 @@ export function ExerciseBrowser({ categories, exercises }: Props): React.JSX.Ele
 
   const filtered = exercises.filter((e) => {
     if (categorySlug && e.categorySlug !== categorySlug) return false;
-    if (equipment !== "all") {
-      const ok = e.equipment === equipment || e.equipment === "both";
-      if (!ok) return false;
-    }
+    if (equipment !== "all" && !e.requires.includes(equipment)) return false;
     if (difficulty !== "all" && e.difficulty !== difficulty) return false;
     return true;
   });
@@ -149,14 +141,14 @@ export function ExerciseBrowser({ categories, exercises }: Props): React.JSX.Ele
 
       <div style={styles.filterRow}>
         <span style={styles.meta}>Equipment:</span>
-        {(["all", "bodyweight", "dumbbells", "both"] as const).map((e) => (
+        {(["all", ...EQUIPMENT_KINDS] as EquipmentFilter[]).map((e) => (
           <button
             type="button"
             key={e}
             style={pillStyle(equipment === e)}
             onClick={() => setEquipment(e)}
           >
-            {e === "all" ? "Any" : EQUIPMENT_LABEL[e]}
+            {e === "all" ? "Any" : EQUIPMENT_LABELS[e]}
           </button>
         ))}
         <span style={{ ...styles.meta, marginLeft: "0.5rem" }}>Difficulty:</span>
@@ -205,8 +197,8 @@ function ExerciseCard({ exercise, isOpen, onToggle }: CardProps): React.JSX.Elem
         Primary: {exercise.primaryMuscles.join(", ")}
       </div>
       <div>
-        <span style={badgeStyle(EQUIPMENT_COLOR[exercise.equipment])}>
-          {EQUIPMENT_LABEL[exercise.equipment]}
+        <span style={badgeStyle("#93c5fd")}>
+          {exercise.requires.map((kind) => EQUIPMENT_LABELS[kind]).join(" · ")}
         </span>
         <span style={badgeStyle(DIFFICULTY_COLOR[exercise.difficulty])}>{exercise.difficulty}</span>
       </div>

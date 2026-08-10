@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS exercises (
   name TEXT NOT NULL,
   category_slug TEXT NOT NULL REFERENCES categories(slug),
   sub_category TEXT,
-  equipment TEXT NOT NULL CHECK (equipment IN ('bodyweight', 'dumbbells', 'both')),
+  requires TEXT NOT NULL,           -- JSON array of EquipmentKind
   primary_muscles TEXT NOT NULL,    -- comma-separated
   secondary_muscles TEXT NOT NULL,  -- comma-separated
   difficulty TEXT NOT NULL CHECK (difficulty IN ('beginner', 'intermediate', 'advanced')),
@@ -24,7 +24,17 @@ CREATE TABLE IF NOT EXISTS exercises (
 );
 
 CREATE INDEX IF NOT EXISTS idx_exercises_category ON exercises(category_slug);
-CREATE INDEX IF NOT EXISTS idx_exercises_equipment ON exercises(equipment);
+
+
+CREATE TABLE IF NOT EXISTS locations (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  equipment TEXT NOT NULL,                  -- JSON array of EquipmentKind
+  excluded_exercise_slugs TEXT NOT NULL,    -- JSON array of slugs
+  display_order INTEGER NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_locations_display_order ON locations(display_order);
 
 
 CREATE TABLE IF NOT EXISTS personalization (
@@ -35,9 +45,8 @@ CREATE TABLE IF NOT EXISTS personalization (
     CHECK (experience IN ('beginner', 'intermediate', 'advanced')),
   days_per_week INTEGER NOT NULL CHECK (days_per_week BETWEEN 2 AND 7),
   session_minutes INTEGER NOT NULL CHECK (session_minutes IN (15, 30, 45)),
-  has_dumbbells INTEGER NOT NULL CHECK (has_dumbbells IN (0, 1)),
   low_impact_only INTEGER NOT NULL CHECK (low_impact_only IN (0, 1)),
-  excluded_exercise_slugs TEXT NOT NULL,
+  location_id TEXT NOT NULL,
   generator_version INTEGER NOT NULL,
   plan_json TEXT NOT NULL,
   generated_at TEXT NOT NULL,

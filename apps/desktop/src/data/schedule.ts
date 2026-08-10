@@ -1,6 +1,12 @@
-import type { Difficulty, Exercise } from "./exercises";
+import {
+  type Difficulty,
+  EQUIPMENT_LABELS,
+  type EquipmentKind,
+  type Exercise,
+} from "./exercises.ts";
+import { equipmentCovers, type Location } from "./locations.ts";
 
-export const PERSONALIZATION_GENERATOR_VERSION = 1 as const;
+export const PERSONALIZATION_GENERATOR_VERSION = 2 as const;
 
 export type TrainingGoal = "general_fitness" | "strength" | "conditioning" | "mobility_balance";
 export type DaysPerWeek = 2 | 3 | 4 | 5 | 6 | 7;
@@ -13,9 +19,8 @@ export interface PersonalizationProfile {
   experience: Difficulty;
   daysPerWeek: DaysPerWeek;
   sessionMinutes: SessionMinutes;
-  hasDumbbells: boolean;
   lowImpactOnly: boolean;
-  excludedExerciseSlugs: string[];
+  locationId: string;
 }
 
 export type Prescription =
@@ -55,11 +60,16 @@ export interface WeeklyPlan {
 }
 
 export interface PlanGenerationIssue {
-  code: "invalid_profile" | "missing_catalog_exercise" | "insufficient_eligible_exercises";
+  code:
+    | "invalid_profile"
+    | "missing_catalog_exercise"
+    | "insufficient_eligible_exercises"
+    | "location_missing";
   message: string;
   day?: number;
   focus?: PlanFocus;
   slug?: string;
+  locationId?: string;
 }
 
 export type PlanGenerationResult =
@@ -238,21 +248,17 @@ export function isPersonalizationProfile(value: unknown): value is Personalizati
     experience?: unknown;
     daysPerWeek?: unknown;
     sessionMinutes?: unknown;
-    hasDumbbells?: unknown;
     lowImpactOnly?: unknown;
-    excludedExerciseSlugs?: unknown;
+    locationId?: unknown;
   };
-  const exclusions = profile.excludedExerciseSlugs;
   return (
     isOneOf(profile.primaryGoal, GOALS) &&
     isOneOf(profile.experience, DIFFICULTIES) &&
     isOneOf(profile.daysPerWeek, DAYS_PER_WEEK) &&
     isOneOf(profile.sessionMinutes, SESSION_MINUTES) &&
-    typeof profile.hasDumbbells === "boolean" &&
     typeof profile.lowImpactOnly === "boolean" &&
-    Array.isArray(exclusions) &&
-    exclusions.every((slug) => typeof slug === "string") &&
-    new Set(exclusions).size === exclusions.length
+    typeof profile.locationId === "string" &&
+    profile.locationId.length > 0
   );
 }
 
@@ -388,12 +394,75 @@ const isEligible = (
   candidate: PlanCandidate,
   exercise: Exercise,
   profile: PersonalizationProfile,
+  location: Location,
   exclusions: Set<string>,
 ): boolean =>
   DIFFICULTIES.indexOf(exercise.difficulty) <= DIFFICULTIES.indexOf(profile.experience) &&
-  (profile.hasDumbbells || exercise.equipment !== "dumbbells") &&
+  equipmentCovers(location.equipment, exercise.requires) &&
   (!profile.lowImpactOnly || candidate.impact === "low") &&
   !exclusions.has(candidate.slug);
+
+// Missing equipment is the most likely reason a focus starves, and it is fixed
+// on a different screen than exclusions are. Name the kinds the location lacks.
+const missingEquipment = (
+  pool: PlanCandidate[],
+  bySlug: Map<string, Exercise>,
+  location: Location,
+): EquipmentKind[] => [
+  ...new Set(
+    pool
+      .filter((candidate) => bySlug.has(candidate.slug))
+      .flatMap((candidate) => (bySlug.get(candidate.slug) as Exercise).requires)
+      .filter((kind) => !location.equipment.includes(kind)),
+  ),
+];
+
+const insufficientMessage = (
+  day: number,
+  focus: PlanFocus,
+  pool: PlanCandidate[],
+  bySlug: Map<string, Exercise>,
+  location: Location,
+): string => {
+  const missing = missingEquipment(pool, bySlug, location);
+  return (
+    `Not enough eligible exercises for day ${day} (${FOCUS_LABELS[focus]}). ` +
+    "Change exclusions or profile constraints." +
+    (missing.length > 0
+      ? ` Add ${missing.map((kind) => EQUIPMENT_LABELS[kind]).join(" or ")} at ${location.name}, or pick another place.`
+      : "")
+  );
+};
+
+export interface FocusReadiness {
+  focus: PlanFocus;
+  label: string;
+  eligible: number;
+  missing: EquipmentKind[];
+}
+
+/**
+ * How many candidates each focus pool has left at a location, counting only the
+ * equipment and exclusion filters. Shown before generation so a starved focus is
+ * visible next to the checkbox that fixes it, not one screen away.
+ */
+export function locationReadiness(location: Location, catalog: Exercise[]): FocusReadiness[] {
+  const bySlug = new Map(catalog.map((exercise) => [exercise.slug, exercise]));
+  const exclusions = new Set(location.excludedExerciseSlugs);
+  return FOCUSES.map((focus) => {
+    const pool = CANDIDATE_POOLS[focus].filter((candidate) => bySlug.has(candidate.slug));
+    return {
+      focus,
+      label: FOCUS_LABELS[focus],
+      eligible: pool.filter(
+        (candidate) =>
+          equipmentCovers(location.equipment, (bySlug.get(candidate.slug) as Exercise).requires) &&
+          !exclusions.has(candidate.slug),
+      ).length,
+      missing: missingEquipment(pool, bySlug, location),
+    };
+  });
+}
 
 const prescribed = ({ slug, prescription, notes }: PlanCandidate): PrescribedExercise => ({
   slug,
@@ -404,6 +473,7 @@ const prescribed = ({ slug, prescription, notes }: PlanCandidate): PrescribedExe
 export function generateWeeklyPlan(
   profile: PersonalizationProfile,
   catalog: Exercise[],
+  locations: Location[],
 ): PlanGenerationResult {
   if (!isPersonalizationProfile(profile)) {
     return {
@@ -412,6 +482,20 @@ export function generateWeeklyPlan(
         {
           code: "invalid_profile",
           message: "Profile contains invalid personalization values.",
+        },
+      ],
+    };
+  }
+
+  const location = locations.find((candidate) => candidate.id === profile.locationId);
+  if (!location) {
+    return {
+      ok: false,
+      issues: [
+        {
+          code: "location_missing",
+          message: `Location "${profile.locationId}" no longer exists. Pick a location and regenerate.`,
+          locationId: profile.locationId,
         },
       ],
     };
@@ -437,11 +521,11 @@ export function generateWeeklyPlan(
   }
   if (missingIssues.length > 0) return { ok: false, issues: missingIssues };
 
-  const exclusions = new Set(profile.excludedExerciseSlugs);
+  const exclusions = new Set(location.excludedExerciseSlugs);
   const eligibleWarmups = WARMUPS.filter((candidate) =>
-    isEligible(candidate, bySlug.get(candidate.slug) as Exercise, profile, exclusions),
+    isEligible(candidate, bySlug.get(candidate.slug) as Exercise, profile, location, exclusions),
   );
-  const warnings: PlanWarning[] = profile.excludedExerciseSlugs
+  const warnings: PlanWarning[] = location.excludedExerciseSlugs
     .filter((slug) => !bySlug.has(slug))
     .map((slug) => ({ code: "unknown_exclusion", slug }));
 
@@ -452,7 +536,7 @@ export function generateWeeklyPlan(
       issues: [
         {
           code: "insufficient_eligible_exercises",
-          message: `Not enough eligible exercises for day 1 (${FOCUS_LABELS[focus]}). Change exclusions or profile constraints.`,
+          message: insufficientMessage(1, focus, WARMUPS, bySlug, location),
           day: 1,
           focus,
         },
@@ -465,7 +549,7 @@ export function generateWeeklyPlan(
   for (const [index, focus] of focuses.entries()) {
     const day = index + 1;
     const eligible = CANDIDATE_POOLS[focus].filter((candidate) =>
-      isEligible(candidate, bySlug.get(candidate.slug) as Exercise, profile, exclusions),
+      isEligible(candidate, bySlug.get(candidate.slug) as Exercise, profile, location, exclusions),
     );
     if (eligible.length < 2) {
       return {
@@ -473,7 +557,7 @@ export function generateWeeklyPlan(
         issues: [
           {
             code: "insufficient_eligible_exercises",
-            message: `Not enough eligible exercises for day ${day} (${FOCUS_LABELS[focus]}). Change exclusions or profile constraints.`,
+            message: insufficientMessage(day, focus, CANDIDATE_POOLS[focus], bySlug, location),
             day,
             focus,
           },
