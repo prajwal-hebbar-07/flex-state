@@ -25,6 +25,9 @@ export async function migrate(): Promise<void> {
   const db = await getDb();
   // schema.sql contains CREATE TABLE / CREATE INDEX statements, all idempotent.
   await db.execute(schemaSql);
+  // CREATE TABLE IF NOT EXISTS is a no-op on installs made before `video` existed,
+  // so add it separately. Throws "duplicate column name" once it is there.
+  await db.execute("ALTER TABLE exercises ADD COLUMN video TEXT").catch(() => {});
 }
 
 export async function seed(): Promise<void> {
@@ -41,8 +44,8 @@ export async function seed(): Promise<void> {
       `INSERT OR REPLACE INTO exercises (
         slug, name, category_slug, sub_category, equipment,
         primary_muscles, secondary_muscles, difficulty,
-        instructions, tips, source_refs, display_order
-      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
+        instructions, tips, source_refs, video, display_order
+      ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
       [
         ex.slug,
         ex.name,
@@ -55,6 +58,7 @@ export async function seed(): Promise<void> {
         ex.instructions,
         ex.tips,
         JSON.stringify(ex.sourceRefs),
+        ex.video ?? null,
         ex.displayOrder,
       ],
     );
@@ -78,6 +82,7 @@ interface DbExerciseRow {
   instructions: string;
   tips: string;
   source_refs: string;
+  video: string | null;
   display_order: number;
 }
 
@@ -106,6 +111,7 @@ function rowToExercise(row: DbExerciseRow): Exercise {
     instructions: row.instructions,
     tips: row.tips,
     sourceRefs: refs,
+    video: row.video ?? undefined,
     displayOrder: row.display_order,
   };
 }

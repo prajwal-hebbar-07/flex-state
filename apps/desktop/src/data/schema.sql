@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS exercises (
   instructions TEXT NOT NULL,
   tips TEXT NOT NULL,
   source_refs TEXT NOT NULL,        -- JSON array of {label, url}
+  video TEXT,                       -- demo video URL, NULL when none
   display_order INTEGER NOT NULL
 );
 

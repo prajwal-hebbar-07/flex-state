@@ -29,6 +29,8 @@ export interface Exercise {
   instructions: string;
   tips: string;
   sourceRefs: SourceRef[];
+  /** Demo video. YouTube watch URL; the UI swaps it to an embed. */
+  video?: string;
   displayOrder: number;
 }
 
@@ -158,40 +160,6 @@ const BODYBLUEPRINT = {
   url: "https://thebodyblueprint.com/bird-dog-exercise-core-strength-benefits/",
 };
 
-// Local PDF source refs. The "label" is a stable short cite; the "url" points
-// at the file path on the user's machine where these were sourced.
-const PDF_BASIC = {
-  label: "PDF: Basic Home Workouts 7-Day Plan",
-  url: "file:///Users/hebbar/Downloads/Telegram%20Desktop/Basic+Workouts+Printable+Plan+EN.pdf",
-};
-const PDF_CALIS = {
-  label: "PDF: Calisthenics 7-Day Plan",
-  url: "file:///Users/hebbar/Downloads/Telegram%20Desktop/Calisthenics+Printable+Plan+EN.pdf",
-};
-const PDF_MIL = {
-  label: "PDF: Military 7-Day Plan",
-  url: "file:///Users/hebbar/Downloads/Telegram%20Desktop/Military__Printable_Plan.pdf",
-};
-const PDF_MILCAL = {
-  label: "PDF: 21-Day Military Calisthenics Plan",
-  url: "file:///Users/hebbar/Downloads/Telegram%20Desktop/military_calisthenics_plan.pdf",
-};
-const PDF_CHAIR_TAI = {
-  label: "PDF: Chair Tai Chi 7-Day Plan",
-  url: "file:///Users/hebbar/Downloads/Telegram%20Desktop/Chair+Tai+Chi+Printable+Plan+EN.pdf",
-};
-const PDF_TAI_10 = {
-  label: "PDF: 10-Day Tai Chi Challenge",
-  url: "file:///Users/hebbar/Downloads/Telegram%20Desktop/TaiChi_Printable.Plan.pdf",
-};
-const PDF_TAI_7 = {
-  label: "PDF: Tai Chi 7-Day Plan",
-  url: "file:///Users/hebbar/Downloads/Telegram%20Desktop/Tai+Chi+Printable+Plan+EN.pdf",
-};
-const PDF_TAI_WALK = {
-  label: "PDF: Tai Chi Walking 7-Day Plan",
-  url: "file:///Users/hebbar/Downloads/Telegram%20Desktop/Tai+Chi+Walking+Printable+Plan+EN.pdf",
-};
 const NHS_TAI_CHI = {
   label: "Torbay NHS: Tai Chi for Beginners",
   url: "https://torbayandsouthdevon.nhs.uk/uploads/taichi-exercises.pdf",
@@ -218,6 +186,7 @@ export const EXERCISES: Exercise[] = [
       "Start prone with hands under shoulders, legs extended, ankles dorsiflexed. Brace core, glutes and quads so the body is a rigid plank. Lower with elbows ~45 degrees from torso until chest or chin grazes the floor. Press back up by pushing the floor away, keeping head aligned with spine.",
     tips: "Push through the heel and outer edge of your palm for more force and shoulder stability. If hips sag, regress to knee push-ups or elevate hands on a bench.",
     sourceRefs: [ACE_PUSHUP, ATHLEAN],
+    video: "https://www.youtube.com/watch?v=IODxDxX7oi4",
     displayOrder: 1,
   },
   {
@@ -232,6 +201,7 @@ export const EXERCISES: Exercise[] = [
       "Place hands on a sturdy elevated surface (bench, table, counter), arms shoulder-width apart, body in a straight line. Lower chest toward the edge with elbows tracking back. Press up to full arm extension.",
     tips: "Lower the incline as you get stronger; the floor is the final regression. Keep core braced so hips don't pike.",
     sourceRefs: [CALISTE, SUPERPROF],
+    video: "https://www.youtube.com/watch?v=E--Ls5QtFqI",
     displayOrder: 2,
   },
   {
@@ -246,6 +216,7 @@ export const EXERCISES: Exercise[] = [
       "Place feet on a bench or sturdy chair, hands on the floor shoulder-width apart. Maintain a rigid plank from heels to head. Lower until chest nears the floor, then press up.",
     tips: "Elevate feet higher to bias upper chest and front delts further. Don't let the low back sag.",
     sourceRefs: [BOS, SVETNESS],
+    video: "https://www.youtube.com/watch?v=SKPab2YC8BE",
     displayOrder: 3,
   },
   {
@@ -260,6 +231,7 @@ export const EXERCISES: Exercise[] = [
       "Form a diamond shape with thumbs and index fingers on the floor under your chest. Keep elbows close to your torso as you lower until hands touch your chest, then press up.",
     tips: "Hands closer together means more triceps and inner chest; too narrow will jam wrists. Stop a set short of elbow flare.",
     sourceRefs: [SVETNESS, ATHLEAN],
+    video: "https://www.youtube.com/watch?v=J0DnG1_S92I",
     displayOrder: 4,
   },
   {
@@ -274,6 +246,7 @@ export const EXERCISES: Exercise[] = [
       "Hands placed wider than shoulder-width, elbows flared ~70 degrees from torso. Lower with control until chest is near the floor, then press back up.",
     tips: "Don't go so wide that shoulders shrug or elbows drift past 90 degrees; this stresses the shoulder joint.",
     sourceRefs: [SUPERPROF, ATHLEAN],
+    video: "https://www.youtube.com/watch?v=rr6eFNNDQdU",
     displayOrder: 5,
   },
   {
@@ -289,6 +262,7 @@ export const EXERCISES: Exercise[] = [
       "From a push-up position, walk feet toward hands and lift hips so your body forms an inverted V. Hands under shoulders, head between them. Bend elbows to lower the crown of your head toward the floor, then press back up.",
     tips: "The further your feet are from your hands, the more vertical you are and the harder the press. Progress by elevating feet on a bench.",
     sourceRefs: [CALISTE, SVETNESS],
+    video: "https://www.youtube.com/watch?v=3r3tvRF1tVA",
     displayOrder: 6,
   },
   {
@@ -303,6 +277,7 @@ export const EXERCISES: Exercise[] = [
       "Start in an inverted-V pike. Sweep down and forward, lowering chest toward the floor while arching the back, then reverse the arc pressing hips back up to the starting pike.",
     tips: "Hits chest, shoulders, and triceps across the range. Use a wide hand position; control the sweep on the way down.",
     sourceRefs: [ATHLEAN],
+    video: "https://www.youtube.com/watch?v=mvNcSF-nXg4",
     displayOrder: 7,
   },
   {
@@ -317,6 +292,7 @@ export const EXERCISES: Exercise[] = [
       "Lie on the floor, knees bent, feet flat. Hold dumbbells at chest with palms forward, elbows on the floor at ~45 degrees. Press dumbbells straight up over the chest until arms extend, then lower under control until elbows touch the floor.",
     tips: "The floor limits range of motion, sparing the shoulders. Easier on a stiff shoulder than a full bench press.",
     sourceRefs: [TODAY_DB, FED],
+    video: "https://www.youtube.com/watch?v=uUGDRwge4F8",
     displayOrder: 8,
   },
   {
@@ -331,6 +307,7 @@ export const EXERCISES: Exercise[] = [
       "Sit on a bench or the floor with a dumbbell in each hand on your thighs. Lie back, kick the bells up to chest level. Press straight up until arms are extended, then lower slowly with elbows tracking ~45 degrees from the body.",
     tips: "Dumbbells allow a deeper stretch and force each side to work independently. Keep wrists stacked over elbows.",
     sourceRefs: [TODAY_DB, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=pKZMNVbfUzQ",
     displayOrder: 9,
   },
   {
@@ -345,6 +322,7 @@ export const EXERCISES: Exercise[] = [
       "Lie on the floor with dumbbells held above chest, palms facing, slight bend in elbows. Lower the bells out wide in an arc until your upper arms touch the floor. Reverse the arc to bring them back together.",
     tips: "Maintain the soft elbow bend throughout; straight arms put the load on the elbow joint. Picture hugging a wide barrel.",
     sourceRefs: [GYMSHARK, TODAY_DB],
+    video: "https://www.youtube.com/watch?v=bgC53-J-6gA",
     displayOrder: 10,
   },
   {
@@ -360,6 +338,7 @@ export const EXERCISES: Exercise[] = [
       "Lie across a bench (or on the floor) with only your upper back supported. Hold one dumbbell with both hands over your chest, arms slightly bent. Lower the bell in an arc behind your head until you feel a deep lat stretch, then pull it back over your chest.",
     tips: "Keep the ribcage down and pelvis tucked so the lower back doesn't arch excessively. Hinge from the shoulder, not the elbow.",
     sourceRefs: [FED, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=Qc4L9I3pHnw",
     displayOrder: 11,
   },
 
@@ -376,6 +355,7 @@ export const EXERCISES: Exercise[] = [
       "Set a bar (or sturdy table edge) at waist height. Lie underneath, grab it with hands shoulder-width, heels on the floor, body in a straight plank. Pull your chest to the bar by driving elbows down and back, then lower with control.",
     tips: "Lower bar means harder. Keep hips up; a sagging hip means you've lost the brace.",
     sourceRefs: [BOS, CALISTE],
+    video: "https://www.youtube.com/watch?v=5Vy6mjhXg7s",
     displayOrder: 1,
   },
   {
@@ -390,6 +370,7 @@ export const EXERCISES: Exercise[] = [
       "Hang from a bar with hands just outside shoulder-width, palms forward. Initiate the pull by depressing scapula, then drive elbows down toward your hips until chin clears the bar. Lower slowly to a dead hang.",
     tips: "If you can't do a full rep, start with negatives (jump to top, lower in 3-5 s), Australian rows, or band assists. Aim for 10 clean reps before weighted work.",
     sourceRefs: [CALISTE, BOS, SUPERPROF],
+    video: "https://www.youtube.com/watch?v=eGo4IYlbE5g",
     displayOrder: 2,
   },
   {
@@ -404,6 +385,7 @@ export const EXERCISES: Exercise[] = [
       "Hang from a bar with supinated grip (palms facing you), hands shoulder-width apart. Pull until chin clears the bar, then lower under control to a dead hang.",
     tips: "Easier than pull-ups for most people because biceps contribute more. Keep shoulders packed; don't shrug.",
     sourceRefs: [SUPERPROF, CALISTE],
+    video: "https://www.youtube.com/watch?v=brhRXlOhsAM",
     displayOrder: 3,
   },
   {
@@ -418,6 +400,7 @@ export const EXERCISES: Exercise[] = [
       "Step onto a box or jump so you start at the top of a pull-up (chin above bar). Lower yourself as slowly as possible (aim for 3-5 s per rep) to a full dead hang. Reset and repeat.",
     tips: "Best bang-for-buck move if you can't yet do a full pull-up. Eccentric overload builds strength quickly.",
     sourceRefs: [BOS, CALISTE],
+    video: "https://www.youtube.com/watch?v=ELOKABEA1mU",
     displayOrder: 4,
   },
   {
@@ -432,6 +415,7 @@ export const EXERCISES: Exercise[] = [
       "Hang from a bar in a dead hang. Without bending your elbows, pull your shoulder blades down and together so your body rises a few inches. Hold briefly, then return to a passive hang.",
     tips: "Pre-hab staple: teaches the lat engagement every other pull needs. Look small and quiet; no swinging.",
     sourceRefs: [BOS, CALISTE],
+    video: "https://www.youtube.com/watch?v=iKnjSB9VIGo",
     displayOrder: 5,
   },
   {
@@ -447,6 +431,7 @@ export const EXERCISES: Exercise[] = [
       "Grip a bar overhead with hands shoulder-width, palms forward. Hang with shoulders packed (don't shrug up to ears). Hold for time.",
     tips: "Builds grip, decompresses the spine, and stretches lats. Start with 20-30 s and accumulate.",
     sourceRefs: [SUPERPROF, CALISTE],
+    video: "https://www.youtube.com/watch?v=5FQJJvUAYx4",
     displayOrder: 6,
   },
   {
@@ -461,6 +446,7 @@ export const EXERCISES: Exercise[] = [
       "Stand with feet hip-width, hinge at the hips until torso is near horizontal, dumbbells hanging beneath shoulders. Pull the bells to your ribcage, elbows tracking back, then lower until arms extend.",
     tips: "Allow scapulae to articulate at the top; don't yank with the lower back. Keep torso close to horizontal; chest proud, abs braced.",
     sourceRefs: [EXRX_ROW, GYMSHARK, TODAY_DB],
+    video: "https://www.youtube.com/watch?v=6TSP1TRMUzs",
     displayOrder: 7,
   },
   {
@@ -475,6 +461,7 @@ export const EXERCISES: Exercise[] = [
       "Place one knee and the same-side hand on a bench; the other foot stays on the floor. Let the working arm hang straight down with a dumbbell. Pull the bell to your hip, leading with the elbow, then lower.",
     tips: "Don't rotate the torso to throw the weight up. Per ExRx: position knee and supporting arm so the torso is roughly horizontal.",
     sourceRefs: [EXRX_ROW, HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=pYcpY20QaE8",
     displayOrder: 8,
   },
   {
@@ -489,6 +476,7 @@ export const EXERCISES: Exercise[] = [
       "Start in a push-up position with hands on dumbbells. Brace your core and row one dumbbell to your hip without rotating the torso. Lower and repeat on the other side.",
     tips: "Imagine balancing a glass of water on your back. Wider feet help; squeeze glutes hard.",
     sourceRefs: [TODAY_DB, FED],
+    video: "https://www.youtube.com/watch?v=Q28cLuweLv4",
     displayOrder: 9,
   },
   {
@@ -504,6 +492,7 @@ export const EXERCISES: Exercise[] = [
       "Hinge to ~45 degrees torso angle, dumbbells hanging beneath you with palms facing. Raise the bells out to the sides with a soft elbow bend, squeezing the shoulder blades together at the top. Lower slowly.",
     tips: "Lead with the elbows, not the hands. Keep the neck long; don't look up at the bells.",
     sourceRefs: [GYMSHARK, HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=JeSlI2s4XfM",
     displayOrder: 10,
   },
   {
@@ -519,6 +508,7 @@ export const EXERCISES: Exercise[] = [
       "Lie face-down, arms extended forward. Lift arms, chest, and legs off the floor simultaneously, squeezing glutes and lower back. Hold briefly at the top, then lower with control.",
     tips: "Keep the movement small and slow; don't whip the arms. Think length first, height second.",
     sourceRefs: [ATHLEAN, HYROW],
+    video: "https://www.youtube.com/watch?v=HAjQVUp9mS4",
     displayOrder: 11,
   },
 
@@ -535,6 +525,7 @@ export const EXERCISES: Exercise[] = [
       "Stand tall, dumbbells at shoulder height, palms forward. Brace core and glutes, then press the bells straight overhead until arms are fully extended. Lower under control to the start.",
     tips: "Don't flare the ribs; squeeze glutes to keep pelvis stacked under the ribcage. Heavier bells will challenge your bracing more.",
     sourceRefs: [TODAY_DB, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=Did01dFR3Lk",
     displayOrder: 1,
   },
   {
@@ -549,6 +540,7 @@ export const EXERCISES: Exercise[] = [
       "Sit on a chair or bench with back support. Hold dumbbells at shoulder height, palms forward. Press overhead to full extension; lower slowly.",
     tips: "The back support makes bracing easier and isolates the shoulders. Good substitute when standing balance is hard.",
     sourceRefs: [REP, HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=1jYq9QQEWqE",
     displayOrder: 2,
   },
   {
@@ -564,6 +556,7 @@ export const EXERCISES: Exercise[] = [
       "Stand tall with dumbbells by your sides, palms facing in. With a slight bend in the elbows, raise the bells out and up until arms are parallel to the floor. Lower under control.",
     tips: "Lead with the elbows, not the hands. Don't shrug; keep shoulders depressed. Pause briefly at the top.",
     sourceRefs: [GYMSHARK],
+    video: "https://www.youtube.com/watch?v=nnH63icHYXY",
     displayOrder: 3,
   },
   {
@@ -579,6 +572,7 @@ export const EXERCISES: Exercise[] = [
       "Stand with dumbbells in front of thighs, palms down. With a soft elbow bend, raise one or both bells straight out in front to shoulder height. Lower with control.",
     tips: "Rare to need heavy weight; anterior delts get hit in most presses already. Keep the move strict; no body English.",
     sourceRefs: [HEALTHLINE, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=-t7fuZ0KhDA",
     displayOrder: 4,
   },
   {
@@ -593,6 +587,7 @@ export const EXERCISES: Exercise[] = [
       "Start with dumbbells at chin height, palms toward you. As you press up, rotate the wrists so palms finish facing forward. Reverse the rotation on the way down.",
     tips: "Named for Arnold Schwarzenegger; the rotation recruits more of the deltoid than a straight press. Go lighter than a regular overhead press.",
     sourceRefs: [HEALTHLINE, FED],
+    video: "https://www.youtube.com/watch?v=pQDrcNoDNVM",
     displayOrder: 5,
   },
   {
@@ -608,6 +603,7 @@ export const EXERCISES: Exercise[] = [
       "Stand tall with dumbbells in front of thighs, palms facing your body. Pull the bells straight up along your body to chest height, elbows leading higher than hands. Lower under control.",
     tips: "Pulling wider (using a wide grip) puts more load on the lateral delts. Stop at chest height; going higher usually means shrug-only.",
     sourceRefs: [HEALTHLINE, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=IhZLB48kluc",
     displayOrder: 6,
   },
   {
@@ -623,6 +619,7 @@ export const EXERCISES: Exercise[] = [
       "Place hands on the floor about 30 cm from a wall. Kick up into a handstand with heels resting on the wall, body stacked. Lower until your head grazes the floor, then press up to full extension.",
     tips: "If a full handstand is too much, start with pike push-ups (feet on a bench). Always warm up the wrists and shoulders first.",
     sourceRefs: [BOS, CALISTE],
+    video: "https://www.youtube.com/watch?v=6MdyYIRS7FY",
     displayOrder: 7,
   },
   {
@@ -638,6 +635,7 @@ export const EXERCISES: Exercise[] = [
       "Place hands on the floor shoulder-width, kick up into a handstand against a wall. Drive the floor away with your palms, pack the shoulders (don't shrug), and brace core and glutes to keep the body stacked.",
     tips: "Hold 20-60 s. Practice against a wall first. Builds pressing strength and shoulder health long-term.",
     sourceRefs: [CALISTE, BOS],
+    video: "https://www.youtube.com/watch?v=xMFRkQpXVoI",
     displayOrder: 8,
   },
 
@@ -655,6 +653,7 @@ export const EXERCISES: Exercise[] = [
       "Stand with feet shoulder-width, dumbbells at sides, palms forward. Keeping upper arms pinned, curl the bells by bending the elbows until the dumbbells reach shoulder height. Lower slowly.",
     tips: "Keep elbows close to the ribs and squeeze at the top before lowering. Don't swing; ego curls cost you gains and your lower back.",
     sourceRefs: [GYMSHARK, TODAY_DB],
+    video: "https://www.youtube.com/watch?v=ykJmrZ5v0Oo",
     displayOrder: 1,
   },
   {
@@ -670,6 +669,7 @@ export const EXERCISES: Exercise[] = [
       "Curl one dumbbell at a time. As one arm lowers, the other begins to curl. Keep both upper arms tight to your sides.",
     tips: "Great for pacing and tempo work. Resist the urge to lean to one side.",
     sourceRefs: [TODAY_DB, HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=sAq_ocpRh_I",
     displayOrder: 2,
   },
   {
@@ -685,6 +685,7 @@ export const EXERCISES: Exercise[] = [
       "Hold dumbbells at sides with a neutral grip (palms facing each other). Curl without rotating the wrist, keeping thumbs pointing up.",
     tips: "Neutral grip shifts emphasis to brachialis and forearms; gives the upper arm a thicker look.",
     sourceRefs: [GYMSHARK, HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=zC3nLlEvin4",
     displayOrder: 3,
   },
   {
@@ -700,6 +701,7 @@ export const EXERCISES: Exercise[] = [
       "Sit on a bench, legs wide. Brace the working elbow against the inside of your thigh, palm up. Curl the dumbbell, pausing at the top to squeeze. Lower slowly.",
     tips: "Best isolation move for the bicep peak. Use your free hand to keep the upper arm pinned if needed.",
     sourceRefs: [HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=Jvj2wV0vOYU",
     displayOrder: 4,
   },
   {
@@ -715,6 +717,7 @@ export const EXERCISES: Exercise[] = [
       "Sit on a sturdy bench or chair edge, hands next to hips, fingers forward. Walk feet forward so your weight is on your hands. Lower your body by bending the elbows to ~90 degrees, then press up.",
     tips: "Keep elbows pointing straight back, close to your sides. The straighter your legs, the harder the move.",
     sourceRefs: [BYU_BW, CALISTE],
+    video: "https://www.youtube.com/watch?v=0326dy_-CzM",
     displayOrder: 5,
   },
   {
@@ -730,6 +733,7 @@ export const EXERCISES: Exercise[] = [
       "Hold one dumbbell with both hands behind your head, elbows pointing up. Keeping upper arms close to your head, bend the elbows to lower the bell behind your neck. Extend back up.",
     tips: "Keep ribs down and core braced so the lower back doesn't arch. Heavier bells really bias the long head.",
     sourceRefs: [GYMSHARK],
+    video: "https://www.youtube.com/watch?v=-Vyt2QdsR7E",
     displayOrder: 6,
   },
   {
@@ -745,6 +749,7 @@ export const EXERCISES: Exercise[] = [
       "Hinge to ~45 degrees, dumbbells in hand, upper arms pinned to your sides, elbows bent at 90 degrees. Extend the elbows until arms are straight back, squeezing triceps. Lower with control.",
     tips: "Keep upper arms still; only the forearms move. Squeeze hard at lockout.",
     sourceRefs: [TODAY_DB, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=6SS6K3lAwZ8",
     displayOrder: 7,
   },
   {
@@ -760,6 +765,7 @@ export const EXERCISES: Exercise[] = [
       "Hands placed directly under the chest, narrower than shoulder-width (almost touching). Lower with elbows tracking close to the torso. Press up.",
     tips: "Easier on the wrists than diamond; very effective triceps builder with no equipment.",
     sourceRefs: [ATHLEAN, SUPERPROF],
+    video: "https://www.youtube.com/watch?v=F1Lq9LnyvVc",
     displayOrder: 8,
   },
   {
@@ -775,6 +781,7 @@ export const EXERCISES: Exercise[] = [
       "Curl dumbbells to shoulders. Rotate palms to face forward at the top. Press straight overhead. Reverse the path on the way down.",
     tips: "Great density move for time-poor sessions. Don't rush the transition; that's where control goes.",
     sourceRefs: [TODAY_DB],
+    video: "https://www.youtube.com/watch?v=zdQOmPMGjOY",
     displayOrder: 9,
   },
 
@@ -792,6 +799,7 @@ export const EXERCISES: Exercise[] = [
       "Stand with feet slightly wider than hip-width, toes turned out. Brace core. Hinge hips back as if sitting into a chair, then bend knees. Descend until thighs are at least parallel. Drive through the whole foot to stand.",
     tips: "Per ACE: push the hips BACK first to load the posterior chain, then drop. Knees track over the second toe. Heels stay planted.",
     sourceRefs: [ACE_SQUAT, BYU_BW, SUPERPROF],
+    video: "https://www.youtube.com/watch?v=P-yaD24bUE8",
     displayOrder: 1,
   },
   {
@@ -807,6 +815,7 @@ export const EXERCISES: Exercise[] = [
       "Hold a dumbbell vertically at chest with both hands under the top plate. Squat between your legs, keeping torso tall. Drive through mid-foot to stand.",
     tips: "Per ExRx: descend until thighs are just past parallel. The counterweight makes it easier to stay upright; great squat primer.",
     sourceRefs: [ACE_GOBLET, EXRX_GOBLET, TODAY_DB],
+    video: "https://www.youtube.com/watch?v=JO7D6GJ98wY",
     displayOrder: 2,
   },
   {
@@ -822,6 +831,7 @@ export const EXERCISES: Exercise[] = [
       "Hold a dumbbell in each hand at your sides. Squat with feet shoulder-width, hips back, chest up. Drive up through mid-foot.",
     tips: "Easier to grip than a barbell for home workouts. The side load teaches good squat mechanics.",
     sourceRefs: [EXRX_DBSQ, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=ZXwvmRSRRxY",
     displayOrder: 3,
   },
   {
@@ -837,6 +847,7 @@ export const EXERCISES: Exercise[] = [
       "Stand tall, feet together, hands on hips. Step one foot forward, drop the back knee toward the floor until both knees are at ~90 degrees. Front knee stays behind the front toes. Push off the front foot to return.",
     tips: "Per ACE: drop the hips down rather than forward to control shin travel. Tall torso throughout.",
     sourceRefs: [ACE_LUNGE, BYU_BW],
+    video: "https://www.youtube.com/watch?v=QE_hU8XX48I",
     displayOrder: 4,
   },
   {
@@ -852,6 +863,7 @@ export const EXERCISES: Exercise[] = [
       "Hold dumbbells at your sides. Step forward (or reverse lunge) and descend until the back knee grazes the floor. Drive up through the front heel.",
     tips: "Same cues as the bodyweight version; the bells add upper-body load and make balance a bigger factor.",
     sourceRefs: [TODAY_DB, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=G4gAK8Bhyro",
     displayOrder: 5,
   },
   {
@@ -867,6 +879,7 @@ export const EXERCISES: Exercise[] = [
       "From standing, step one foot BACK and drop the back knee toward the floor. Front shin stays close to vertical. Drive through the front heel to return.",
     tips: "Reverse lunges are easier on the knees than forward lunges and bias the glutes a bit more.",
     sourceRefs: [ACE_LUNGE, REP],
+    video: "https://www.youtube.com/watch?v=94AXT7D3bKY",
     displayOrder: 6,
   },
   {
@@ -882,6 +895,7 @@ export const EXERCISES: Exercise[] = [
       "Stand a couple of feet in front of a bench, top of one foot resting on it behind you. Hold dumbbells at your sides. Lower until the front thigh is parallel to the floor, then drive up.",
     tips: "Front foot placement dictates knee vs hip emphasis. Front heel planted; weight stays over mid-foot.",
     sourceRefs: [CALISTE, BOS, TODAY_DB],
+    video: "https://www.youtube.com/watch?v=2C-uNgKwPLE",
     displayOrder: 7,
   },
   {
@@ -897,6 +911,7 @@ export const EXERCISES: Exercise[] = [
       "Stand with dumbbells in front of thighs, palms facing you. Hinge at the hips, pushing your butt back while keeping a soft bend in the knees. Lower the bells along your thighs until you feel a strong hamstring stretch. Drive hips forward to stand.",
     tips: "Back stays flat; the bells slide close to the legs. Knees only bend slightly; this is a hinge, not a squat.",
     sourceRefs: [TODAY_DB, FED, HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=FQKfr1YDhEk",
     displayOrder: 8,
   },
   {
@@ -912,6 +927,7 @@ export const EXERCISES: Exercise[] = [
       "Stand with dumbbells in front of thighs, feet hip-width. Hinge at the hips and bend knees to lower the bells to just below the knees, back flat, chest up. Drive hips forward to stand tall, squeezing glutes at the top.",
     tips: "Different from RDL: knees bend more, you go lower, it's more of a full-body pull. Reset between reps so each starts from a braced standing position.",
     sourceRefs: [TODAY_DB, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=HMcXQyEqJ7A",
     displayOrder: 9,
   },
   {
@@ -927,6 +943,7 @@ export const EXERCISES: Exercise[] = [
       "Lie on your back, knees bent, feet flat on the floor hip-width apart. Drive heels into the floor and lift hips until your body forms a straight line from knees to shoulders. Squeeze glutes at the top; lower with control.",
     tips: "Don't hyperextend the lower back; the squeeze should come from glutes, not spine.",
     sourceRefs: [SUPERPROF, BOS],
+    video: "https://www.youtube.com/watch?v=nbjJjSa0cKo",
     displayOrder: 10,
   },
   {
@@ -942,6 +959,7 @@ export const EXERCISES: Exercise[] = [
       "Same setup as glute bridge, but extend one leg so the working side carries everything. Drive through the planted heel, hips level; don't let the pelvis twist.",
     tips: "Exposes left/right imbalances. If your hip drops, you've lost the brace; shorten the range.",
     sourceRefs: [BOS, HYROW],
+    video: "https://www.youtube.com/watch?v=3NXv0Nany-Q",
     displayOrder: 11,
   },
   {
@@ -957,6 +975,7 @@ export const EXERCISES: Exercise[] = [
       "Sit on the floor with upper back against a bench, dumbbell across the hips. Plant feet flat, then drive through your heels to lift hips until thighs are parallel to the floor. Squeeze glutes at the top.",
     tips: "Pad the bar/dumbbell with a towel for comfort. Ribs down; don't hyperextend the spine.",
     sourceRefs: [FED, HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=29OfN4ztW_g",
     displayOrder: 12,
   },
   {
@@ -972,6 +991,7 @@ export const EXERCISES: Exercise[] = [
       "Hold dumbbells at your sides. Step onto a bench or sturdy chair with one foot, driving through that heel to bring the body fully upright on the box. Step down with control.",
     tips: "Tall box means more glutes; shorter box means more quads. Don't push off the back foot; that's cheating your glutes.",
     sourceRefs: [GYMSHARK, HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=DxUNi119Qzs",
     displayOrder: 13,
   },
   {
@@ -987,6 +1007,7 @@ export const EXERCISES: Exercise[] = [
       "Stand on a step or firm surface with balls of feet on the edge and heels hanging off. Hold dumbbells for resistance. Rise up on the toes as high as possible, pause, then lower the heels below the starting line.",
     tips: "Slow tempo wins. Full stretch at the bottom, hard squeeze at the top; partial reps don't grow calves.",
     sourceRefs: [HEALTHLINE, GYMSHARK],
+    video: "https://www.youtube.com/watch?v=SRUtMJ0tE2A",
     displayOrder: 14,
   },
   {
@@ -1002,6 +1023,7 @@ export const EXERCISES: Exercise[] = [
       "Back flat against a wall, slide down until thighs are parallel to the floor with knees over ankles. Hold.",
     tips: "Toughest at ~60 degrees knee flexion, so going deeper isn't necessarily harder. Stack feet under knees.",
     sourceRefs: [SUPERPROF, BOS],
+    video: "https://www.youtube.com/watch?v=y-wV4Venusw",
     displayOrder: 15,
   },
   {
@@ -1017,6 +1039,7 @@ export const EXERCISES: Exercise[] = [
       "From a lunge, explode upward, switching legs mid-air, and land softly in a lunge with the opposite leg forward. Repeat, alternating each rep.",
     tips: "Land with bent knees and a braced core. Best as a finisher when legs are already warm.",
     sourceRefs: [CALISTE, SUPERPROF],
+    video: "https://www.youtube.com/watch?v=y7Iug7eC0dk",
     displayOrder: 16,
   },
 
@@ -1034,6 +1057,7 @@ export const EXERCISES: Exercise[] = [
       "Lie prone, elbows under shoulders, forearms on the floor. Contract quads, glutes and core to lift the body into a straight line from heels to head. Breathe normally.",
     tips: "Per ACE: no sagging, no hip hiking, no shoulder shrug. Hold 20-60 s; quality over duration.",
     sourceRefs: [ACE_PLANK, BOS],
+    video: "https://www.youtube.com/watch?v=mH5Sfb_KTGg",
     displayOrder: 1,
   },
   {
@@ -1049,6 +1073,7 @@ export const EXERCISES: Exercise[] = [
       "Lie on one side, elbow under shoulder, feet stacked. Lift hips so the body forms a straight line. Hold, then switch sides.",
     tips: "Drive the elbow into the floor to activate the side. Stack hips; don't sag.",
     sourceRefs: [HYROW, BOS],
+    video: "https://www.youtube.com/watch?v=44ND4bOB-T0",
     displayOrder: 2,
   },
   {
@@ -1064,6 +1089,7 @@ export const EXERCISES: Exercise[] = [
       "Lie on your back, arms extended over chest, knees and hips at 90 degrees (tabletop). Press the low back into the floor. Extend opposite arm and leg away from each other, return, and switch sides.",
     tips: "Exhale as you extend. If your low back arches, reduce range; short lever is fine.",
     sourceRefs: [JEFIT_CORE, ATHLEAN],
+    video: "https://www.youtube.com/watch?v=bxn9FBrt4-A",
     displayOrder: 3,
   },
   {
@@ -1079,6 +1105,7 @@ export const EXERCISES: Exercise[] = [
       "From tabletop (hands under shoulders, knees under hips), extend opposite arm and leg so they are parallel to the floor. Pause 1 s, then bring elbow to knee under the torso and extend again.",
     tips: "Per JEFIT: the move fires the transverse abdominis (the body's weight belt) and trains anti-rotation. Keep hips level.",
     sourceRefs: [JEFIT_CORE, BODYBLUEPRINT],
+    video: "https://www.youtube.com/watch?v=ZdAHe9_HeEw",
     displayOrder: 4,
   },
   {
@@ -1094,6 +1121,7 @@ export const EXERCISES: Exercise[] = [
       "Lie on your back, arms overhead. Tuck chin like holding an egg under it. Posteriorly tilt the pelvis so the low back presses into the floor. Lift shoulder blades and legs off the floor (legs together, arms by ears). Hold.",
     tips: "Bent-knee regressions: tuck knees in for less tension, extend to progress. Don't let the low back arch off the floor.",
     sourceRefs: [MASTERCLASS, CALISTE],
+    video: "https://www.youtube.com/watch?v=0yPin8hSc8o",
     displayOrder: 5,
   },
   {
@@ -1109,6 +1137,7 @@ export const EXERCISES: Exercise[] = [
       "Hang from a bar with shoulders packed. Brace core and lift your knees toward your chest by tilting the pelvis (posterior tilt). Lower with control; don't swing.",
     tips: "Pelvic tilt is the move, not just lifting the knees. Progress to straight-leg raises.",
     sourceRefs: [CALISTE, BOS],
+    video: "https://www.youtube.com/watch?v=l7OroezzX9k",
     displayOrder: 6,
   },
   {
@@ -1124,6 +1153,7 @@ export const EXERCISES: Exercise[] = [
       "Lie on your back, legs extended. Press the low back into the floor. Keeping legs straight, lift them until they are perpendicular to the floor, then lower under control.",
     tips: "If the lower back starts to arch before your feet touch the floor, you have gone too far down; stop early.",
     sourceRefs: [ATHLEAN, BOS],
+    video: "https://www.youtube.com/watch?v=sY2ZgV2Sj_s",
     displayOrder: 7,
   },
   {
@@ -1139,6 +1169,7 @@ export const EXERCISES: Exercise[] = [
       "Sit on the floor, knees bent, heels planted. Lean back ~45 degrees holding one dumbbell at chest. Rotate shoulders side to side, tapping the dumbbell to the floor beside each hip.",
     tips: "Per REP Fitness: rotation comes from the torso, not the arms. Lift the heels to make it harder.",
     sourceRefs: [REP, TODAY_DB],
+    video: "https://www.youtube.com/watch?v=s0kT80JLCfA",
     displayOrder: 8,
   },
   {
@@ -1154,6 +1185,7 @@ export const EXERCISES: Exercise[] = [
       "Lie flat, arms overhead. In one motion, crunch up, lifting straight legs and torso to meet in a 'V' shape. Tap your toes with your hands at the top, then lower with control.",
     tips: "Bend knees for a regression (tuck-up). The hardest part is the bottom; don't just drop.",
     sourceRefs: [JEFIT_MC, ATHLEAN],
+    video: "https://www.youtube.com/watch?v=iP2fjvG0g3w",
     displayOrder: 9,
   },
   {
@@ -1169,6 +1201,7 @@ export const EXERCISES: Exercise[] = [
       "From a push-up position, drive one knee toward your chest, then quickly switch legs in a running motion. Keep hips low and core braced.",
     tips: "Per JEFIT: ~60-70% activation is core stabilization. Slow tempo means core work; fast tempo means conditioning.",
     sourceRefs: [JEFIT_MC, ATHLEAN],
+    video: "https://www.youtube.com/watch?v=Q_olQdxEPF4",
     displayOrder: 10,
   },
   {
@@ -1184,6 +1217,7 @@ export const EXERCISES: Exercise[] = [
       "From a high plank, lift one hand to tap the opposite shoulder. Resist the urge to rotate the hips. Alternate sides.",
     tips: "Wider stance means more stable base. Squeeze glutes hard to keep hips level.",
     sourceRefs: [BYU_BW, TODAY_DB],
+    video: "https://www.youtube.com/watch?v=gKA5LBy7WAI",
     displayOrder: 11,
   },
   {
@@ -1199,6 +1233,7 @@ export const EXERCISES: Exercise[] = [
       "Hold a heavy dumbbell in one hand at your side. Walk 20-30 m keeping the torso tall; don't lean toward the bell. Switch hands and repeat.",
     tips: "Stand tall and resist the lateral pull; that's the anti-side-bend work.",
     sourceRefs: [HEALTHLINE, FED],
+    video: "https://www.youtube.com/watch?v=VD6u03iRsD8",
     displayOrder: 12,
   },
 
@@ -1216,6 +1251,7 @@ export const EXERCISES: Exercise[] = [
       "Stand tall, arms at sides. Jump feet out wide while swinging arms overhead. Jump feet back together, arms to sides. Repeat at a steady or fast tempo.",
     tips: "Per Today: ~10 minutes of jacks burns ~100 calories. Great warm-up or HIIT filler.",
     sourceRefs: [TODAY_HIIT, GREATIST],
+    video: "https://www.youtube.com/watch?v=uLVt6u15L98",
     displayOrder: 1,
   },
   {
@@ -1231,6 +1267,7 @@ export const EXERCISES: Exercise[] = [
       "Run in place, driving each knee up to hip height. Pump arms in opposition. Stay on the balls of the feet.",
     tips: "Tall posture; don't lean forward. Faster cadence means more conditioning.",
     sourceRefs: [TODAY_HIIT, GREATIST],
+    video: "https://www.youtube.com/watch?v=D0GwAezTvtg",
     displayOrder: 2,
   },
   {
@@ -1245,6 +1282,7 @@ export const EXERCISES: Exercise[] = [
     instructions: "Run in place, kicking heels up toward glutes. Pump arms. Keep cadence quick.",
     tips: "Pairs well with high knees for a balanced warm-up or HIIT circuit.",
     sourceRefs: [GREATIST, GENESIS],
+    video: "https://www.youtube.com/watch?v=oMW59TKZvaI",
     displayOrder: 3,
   },
   {
@@ -1260,6 +1298,7 @@ export const EXERCISES: Exercise[] = [
       "From standing, squat down, plant hands, jump feet back to a plank. Perform a push-up (optional), jump feet back toward hands, then explode upward with a jump and clap overhead.",
     tips: "Per Today: burpees are a two-part movement (push-up + leap); scale the push-up to your level. Pace for HIIT: 30-45 s work, 15 s rest.",
     sourceRefs: [TODAY_HIIT, ATHLEAN, GREATIST],
+    video: "https://www.youtube.com/watch?v=G2hv_NYhM-A",
     displayOrder: 4,
   },
   {
@@ -1275,6 +1314,7 @@ export const EXERCISES: Exercise[] = [
       "Lower into a squat, then explode upward, fully extending hips. Land softly through the whole foot back into the squat.",
     tips: "Don't pause at the bottom; use the stretch to reload. Soft knees on landing.",
     sourceRefs: [CALISTE, SUPERPROF, BOS],
+    video: "https://www.youtube.com/watch?v=tZSYZdtbONc",
     displayOrder: 5,
   },
   {
@@ -1290,6 +1330,7 @@ export const EXERCISES: Exercise[] = [
       "From a slight squat on one leg, leap laterally to land on the opposite foot. Swing the trailing leg behind and the opposite arm across. Bound side to side.",
     tips: "Land softly and stick the landing before bounding the other way. Builds lateral power most people lack.",
     sourceRefs: [TODAY_HIIT, GREATIST],
+    video: "https://www.youtube.com/watch?v=usZgF8TBWcA",
     displayOrder: 6,
   },
   {
@@ -1305,6 +1346,7 @@ export const EXERCISES: Exercise[] = [
       "Stand with feet wider than shoulder-width, dumbbell on the floor between feet. Hinge and grip the bell. Drive hips explosively to swing the dumbbell up to chest height (let arms guide it, not lift). Let the bell swing back between the legs.",
     tips: "This is a hip hinge, not a front raise. The power comes from glutes; squeeze at the top of each rep.",
     sourceRefs: [TODAY_DB, FED],
+    video: "https://www.youtube.com/watch?v=Y30kFfgW-bY",
     displayOrder: 7,
   },
   {
@@ -1320,6 +1362,7 @@ export const EXERCISES: Exercise[] = [
       "From a dead-stop with dumbbells between feet, hinge down, then explosively extend hips, shrug shoulders, and pull the bells up, catching them at shoulder height with bent elbows.",
     tips: "Don't muscle it; think hip-shrug-pull. Reset between reps for control.",
     sourceRefs: [FED, HEALTHLINE],
+    video: "https://www.youtube.com/watch?v=FRkZEvIXb0k",
     displayOrder: 8,
   },
   {
@@ -1335,6 +1378,7 @@ export const EXERCISES: Exercise[] = [
       "Rope length adjusted so handles reach armpits. Jump on the balls of both feet, keeping elbows in and turning the rope with wrist flicks. Light, quick bounces.",
     tips: "Skipping rope is one of the highest calorie-per-minute home moves. 100-200 skips in a row is a solid starter target.",
     sourceRefs: [GENESIS, GREATIST],
+    video: "https://www.youtube.com/watch?v=8K4KCOHLLJU",
     displayOrder: 9,
   },
   {
@@ -1350,6 +1394,7 @@ export const EXERCISES: Exercise[] = [
       "Stand in a boxing stance (one foot forward, hands guarding face). Throw jabs, crosses, hooks, and rolls for a set time. Move around as if sparring.",
     tips: "3-minute rounds with 30 s rest mimic real boxing conditioning. Stay light on the feet; use the whole room.",
     sourceRefs: [GREATIST, GENESIS],
+    video: "https://www.youtube.com/watch?v=Q5WrJoYhpHE",
     displayOrder: 10,
   },
 
@@ -1375,7 +1420,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand tall with feet hip-width apart. Hinge forward, place hands on the floor, and walk them out to a high plank. Perform a push-up, then walk hands back in and stand tall. Repeat.",
     tips: "Combines a dynamic hamstring stretch with a push-up. If walkout is too hard, walk out to a knee plank. Keep hips level throughout the walk.",
-    sourceRefs: [PDF_CALIS, ACE_PUSHUP],
+    sourceRefs: [ACE_PUSHUP],
+    video: "https://www.youtube.com/watch?v=ET1aHnuvxXY",
     displayOrder: 50,
   },
 
@@ -1394,7 +1440,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Start in a high plank, hands under shoulders. Lower onto your right forearm, then left, into a low plank. Press back up to your right hand, then left, returning to high plank. Alternate the lead arm each rep.",
     tips: "Keep hips level; don't rotate. Lead-arm variation gives the rotator cuff a more dynamic warm-up than a static plank.",
-    sourceRefs: [PDF_MIL, ACE_PLANK],
+    sourceRefs: [ACE_PLANK],
+    video: "https://www.youtube.com/watch?v=uHErJrQZX0g",
     displayOrder: 50,
   },
 
@@ -1413,7 +1460,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand with feet wider than shoulder-width in a stable athletic stance. Sit back and down for 2 seconds, going slightly deeper than a regular squat. Pause 1 s at the bottom, chest tall. Push knees slightly outward, then drive up through heels.",
     tips: "The wider stance and outward knee tracking bias glutes and inner thighs. Slower descent and 1 s pause make it a strength builder rather than cardio.",
-    sourceRefs: [PDF_MILCAL, PDF_MIL, ACE_SQUAT],
+    sourceRefs: [ACE_SQUAT],
+    video: "https://www.youtube.com/watch?v=ksmxuw3JDbQ",
     displayOrder: 50,
   },
   {
@@ -1428,7 +1476,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Start in a half-squat, feet shoulder-width, core braced, chest up. Step your right foot out to the side, staying low. Bring your left foot in to return to stance. Repeat to the other side.",
     tips: "Stay low the whole time. If your heels come up, the step is too long. Builds lateral stability most home workouts skip.",
-    sourceRefs: [PDF_MIL],
+    sourceRefs: [],
+    video: "https://www.youtube.com/watch?v=mu1GzSgcWUk",
     displayOrder: 51,
   },
   {
@@ -1443,7 +1492,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Lower into a squat position and hold it low. Pulse up and down in a small range of motion (about 5-10 cm), keeping heels grounded and core tight. Maintain steady breathing.",
     tips: "Stay low; don't stand up between pulses. If your heels come off the floor, you've gone too deep. 30-45 s is a typical working set.",
-    sourceRefs: [PDF_CALIS, PDF_MILCAL],
+    sourceRefs: [],
+    video: "https://www.youtube.com/watch?v=OXKOvVi-ZT4",
     displayOrder: 52,
   },
   {
@@ -1458,7 +1508,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Lie on your back, knees bent, feet flat hip-width. Press through one heel to lift into a glute bridge, core engaged. Push explosively through that foot, lifting the other leg off the floor. Land softly, then continue alternating.",
     tips: "Power comes from the heel, not the lower back. Easier regression: alternating slow single-leg bridges without the jump. 6-8 explosive reps per side.",
-    sourceRefs: [PDF_MIL, BOS],
+    sourceRefs: [BOS],
+    video: "https://www.youtube.com/watch?v=cExh41fA3A4",
     displayOrder: 53,
   },
   {
@@ -1473,7 +1524,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Lie on your back, knees bent, feet flat hip-width. Press through heels to lift hips until body forms a straight line from knees to shoulders. Squeeze glutes hard, ribs down. Hold and breathe slowly.",
     tips: "Hold 20-45 s. The squeeze is the work, not the height. Progress by holding longer or moving to single-leg.",
-    sourceRefs: [PDF_CALIS, BOS],
+    sourceRefs: [BOS],
+    video: "https://www.youtube.com/watch?v=cmkMMjo0fRo",
     displayOrder: 54,
   },
   {
@@ -1488,7 +1540,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand tall, core braced, hands on hips or behind head (military posture). Step forward into a lunge, lowering until both knees are at ~90 degrees. Drive through the front heel, bring the back leg through into the next lunge. Walk forward for the prescribed distance or rep count.",
     tips: "Tall torso the whole time; no forward lean. Each rep is a full step, not a step-together. Do all reps on one leg, then switch, to keep balance honest.",
-    sourceRefs: [PDF_MILCAL, ACE_LUNGE],
+    sourceRefs: [ACE_LUNGE],
+    video: "https://www.youtube.com/watch?v=vYfp2t4XgqQ",
     displayOrder: 55,
   },
 
@@ -1505,7 +1558,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Lie on your back, knees bent, feet flat on the floor, arms overhead or by your sides. Engage your core and roll up to a sitting position, reaching toward your feet. Lower back down with control, keeping tension in the abs.",
     tips: "Press your lower back into the floor before sitting up; don't yank with your neck. If your feet fly up, anchor them under a heavy object or have a partner hold them.",
-    sourceRefs: [PDF_BASIC, PDF_CALIS, PDF_MILCAL],
+    sourceRefs: [],
+    video: "https://www.youtube.com/watch?v=pCX65Mtc_Kk",
     displayOrder: 50,
   },
   {
@@ -1520,7 +1574,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Lie on your back, hands lightly behind your head, legs extended. Lift shoulders; bring right knee toward chest while twisting to bring left elbow toward it. Switch: left knee in, right elbow to left knee. Continue pedaling in a controlled motion.",
     tips: "Don't pull on your neck; the twist comes from the abs. Slow it down for more ab work, faster for conditioning. Exhale with each crunch.",
-    sourceRefs: [PDF_MIL, ATHLEAN],
+    sourceRefs: [ATHLEAN],
+    video: "https://www.youtube.com/watch?v=wpRI3xBhJmo",
     displayOrder: 51,
   },
   {
@@ -1535,7 +1590,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Lie on your back, legs extended upward at 90 degrees. Hands by your sides or behind your head for support. Brace the core, then crunch sideways, lifting your hips off the floor while keeping legs straight. Lower with control and repeat.",
     tips: "Smaller crunch than a regular sit-up; aim for the obliques, not momentum. Alternate sides or do all reps on one then switch.",
-    sourceRefs: [PDF_MIL],
+    sourceRefs: [],
+    video: "https://www.youtube.com/watch?v=CMJA332bfs0",
     displayOrder: 52,
   },
   {
@@ -1550,7 +1606,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Lie on your back near a wall with your legs extended straight up against it. Press your lower back gently into the floor. Hands behind your head or across your chest. Lift shoulders and upper back off the floor in a controlled crunch. Lower slowly.",
     tips: "Elevated legs reduce hip-flexor dominance, putting more load on the abs. If 90 degrees feels easy, scoot closer to the wall so the legs are more vertical.",
-    sourceRefs: [PDF_MILCAL],
+    sourceRefs: [],
+    video: "https://www.youtube.com/watch?v=iAFdJQ_pFfk",
     displayOrder: 53,
   },
   {
@@ -1565,7 +1622,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand tall with feet hip-width apart. Lift your right knee and bring your left elbow down toward it as they meet at the top. Lower with control. Switch sides smoothly, maintaining a steady rhythm.",
     tips: "Brace the abs as knee and elbow meet. Move at a controlled tempo, not bouncing. Pairs naturally with mountain climbers.",
-    sourceRefs: [PDF_MILCAL, HYROW],
+    sourceRefs: [HYROW],
+    video: "https://www.youtube.com/watch?v=ohT0H_jkWSM",
     displayOrder: 54,
   },
   {
@@ -1580,7 +1638,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "From a high plank, bring your right knee out to the side toward your right elbow, then return to plank. Switch to the left. Keep hips level and don't let them pike up.",
     tips: "Slower and harder than mountain climbers because the leg moves laterally. If your hips rotate, shorten the range or do it from your knees.",
-    sourceRefs: [PDF_CALIS, PDF_MILCAL],
+    sourceRefs: [],
+    video: "https://www.youtube.com/watch?v=pI7uWJXcfPE",
     displayOrder: 55,
   },
   {
@@ -1595,7 +1654,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Start in a forearm plank, elbows under shoulders, body in a straight line. Keeping hips stacked and core tight, rotate the whole body to the right, lowering the right hip toward the floor with control. Return to center, then rotate to the left. Alternate sides smoothly.",
     tips: "Don't let the hips sag or hike. The whole body rotates as one plank. Better than side planks if you can hold the form.",
-    sourceRefs: [PDF_MIL],
+    sourceRefs: [],
+    video: "https://www.youtube.com/watch?v=SqY8T9FODMM",
     displayOrder: 56,
   },
   {
@@ -1610,7 +1670,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Start on all fours, hands under shoulders, knees hovering just off the ground. Keep your back flat, hips low, core engaged. Walk forward by moving opposite hand and foot (right hand + left knee, then left hand + right knee). Walk the prescribed distance, then reverse direction.",
     tips: "Knees stay an inch or two off the floor the whole time. Don't let the hips pike up. The crawl itself is the workout; speed is irrelevant.",
-    sourceRefs: [PDF_MIL, PDF_MILCAL],
+    sourceRefs: [],
+    video: "https://www.youtube.com/watch?v=U3Y58Kyw7Xw",
     displayOrder: 57,
   },
   {
@@ -1625,7 +1686,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand with feet together, arms at sides. Step or hop your feet out to slightly past shoulder-width as you raise your arms overhead. Return to the start. Land softly and keep movements smooth.",
     tips: "Identical to a jumping jack but with a controlled step instead of a jump - easier on the knees. Progress to jumping when ready.",
-    sourceRefs: [PDF_MILCAL, PDF_BASIC],
+    sourceRefs: [],
+    video: "https://www.youtube.com/watch?v=Bqy1xIXX2nc",
     displayOrder: 50,
   },
   {
@@ -1640,7 +1702,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "March in place with strong upright posture. Lift your knees with control, swinging your arms naturally. Keep your feet light and steps quick but controlled. Maintain core engagement and breathe evenly.",
     tips: "Stronger posture than a casual march - imagine you're on parade. Drives the heart rate up without the impact of high knees or running.",
-    sourceRefs: [PDF_MILCAL, GREATIST],
+    sourceRefs: [GREATIST],
+    video: "https://www.youtube.com/watch?v=QilgMPG7OaA",
     displayOrder: 51,
   },
 
@@ -1659,7 +1722,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand tall with feet hip-width apart and weight even. Inhale while sweeping both arms out and up in a smooth circle. Exhale while lowering the arms in front with soft elbows and palms down. Continue slowly, matching each movement to the breath.",
     tips: "Keep the knees soft, spine long, shoulders relaxed, and movement continuous. Use a smaller arm circle if the shoulders feel restricted.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, NHS_TAI_CHI],
+    sourceRefs: [NHS_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=FR7-XiyV4rM",
     displayOrder: 1,
   },
   {
@@ -1674,7 +1738,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand tall with feet hip-width apart and arms relaxed. Inhale and raise the arms with a gently open chest. Exhale and lower the hands to chest level as if softly pressing forward, then return the arms to the sides. Repeat at a steady pace.",
     tips: "Keep the shoulders down and wrists relaxed. Match the entire lift to one inhale and the entire lowering phase to one exhale.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, VA_TAI_CHI],
+    sourceRefs: [VA_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=3aidNxd5Gr0",
     displayOrder: 2,
   },
   {
@@ -1689,7 +1754,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand with feet hip-width apart, knees soft, and arms by the sides. Inhale while raising the arms to shoulder height and opening them outward. Exhale while bringing the arms toward center and lowering them to the sides. Repeat without pausing.",
     tips: "Open only as far as the shoulders allow without arching the lower back. Keep the movement slow enough to follow the breath.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, VA_TAI_CHI],
+    sourceRefs: [VA_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=R8l3ekfOr7o",
     displayOrder: 3,
   },
   {
@@ -1704,7 +1770,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand comfortably with feet hip-width apart. Step one foot back and shift weight toward the front leg. Reach the front hand forward with palm up while lowering the other hand with palm down. Flow the arms forward and back, return to center, then repeat on the other side.",
     tips: "Keep both knees aligned with the toes and shift weight gradually. Shorten the stance if balance or hip mobility limits a smooth transition.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, NHS_TAI_CHI],
+    sourceRefs: [NHS_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=JxGP6dFZiqo",
     displayOrder: 4,
   },
   {
@@ -1719,7 +1786,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand tall with knees slightly bent and hands resting lightly on the abdomen. Soften the gaze. Inhale through the nose and feel the abdomen expand into the hands. Exhale slowly through the nose and feel the abdomen soften. Continue without forcing the breath.",
     tips: "Keep the shoulders still and relaxed. Stop if slow breathing causes light-headedness and resume normal breathing.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, VA_TAI_CHI],
+    sourceRefs: [VA_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=lHN2s5ADvKs",
     displayOrder: 5,
   },
   {
@@ -1734,7 +1802,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand tall with soft knees and arms relaxed. Lift the arms to shoulder height while stepping one foot back and guiding the arms slightly backward. Shift forward and press one palm into the other. Return to center and repeat with the other foot and hand leading.",
     tips: "Shift the body as one unit instead of leaning from the waist. Keep the hands below shoulder height and the elbows soft.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, NHS_TAI_CHI],
+    sourceRefs: [NHS_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=zU5QMUXSdOQ",
     displayOrder: 6,
   },
   {
@@ -1749,7 +1818,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand with soft knees. Step one foot out while opening the arms. Step the other foot in and round the hands as if holding a ball, one hand above the other. Slowly rotate the rounded hands, open the arms into a step on the other side, and repeat with the opposite hand on top.",
     tips: "Keep the imaginary ball shape relaxed rather than rigid. Make each side step small enough to stay balanced.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, VA_TAI_CHI],
+    sourceRefs: [VA_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=0QTB7VlB1Nc",
     displayOrder: 7,
   },
   {
@@ -1764,7 +1834,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Take a wide stance with knees bent and hands supported on the thighs. Keep the back long. Inhale and rotate the torso to one side, looking over that shoulder. Exhale back to center, then inhale and rotate to the other side. Repeat smoothly.",
     tips: "Press the knees outward in line with the toes. Rotate through the upper back without collapsing the chest or forcing the neck.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, VA_TAI_CHI],
+    sourceRefs: [VA_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=I9BFNNlmeV8",
     displayOrder: 8,
   },
   {
@@ -1779,7 +1850,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand in a wide horse stance with toes turned out slightly. Lower into a squat with the back tall and knees tracking over the toes. Rise smoothly while opening the arms wide, then reach overhead with palms together. Lower the arms as you return to the squat and repeat.",
     tips: "Use a shallower squat if the knees turn inward or the heels lift. Keep the ribs stacked over the pelvis during the overhead reach.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, ACE_SQUAT],
+    sourceRefs: [ACE_SQUAT],
+    video: "https://www.youtube.com/watch?v=5bzwZCvHtNI",
     displayOrder: 9,
   },
   {
@@ -1794,7 +1866,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand tall with feet shoulder-width apart and knees soft. Shift weight onto one leg and raise the other knee. Extend the lower leg forward in a controlled kick, retract it to the bent-knee position, then lower the foot. Alternate sides.",
     tips: "Use a wall or sturdy chair for support. Kick lower rather than leaning backward or locking the standing knee.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, NHS_TAI_CHI],
+    sourceRefs: [NHS_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=TFN8eONeuuQ",
     displayOrder: 10,
   },
   {
@@ -1809,7 +1882,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Begin in a wide squat with palms together at chest height. Shift weight to one leg and rise slowly while lifting the opposite knee. Open the arms to the sides and hold briefly. Lower the foot and return to the squat, then repeat on the other side.",
     tips: "Use a shallower squat or fingertip support when needed. Keep the standing hip level and avoid locking the standing knee.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, VA_TAI_CHI],
+    sourceRefs: [VA_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=ZIYCPtDAO6A",
     displayOrder: 11,
   },
   {
@@ -1824,7 +1898,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand with feet shoulder-width apart, toes forward, and knees slightly bent. Spread weight evenly across the heel, base of the big toe, and base of the little toe on each foot. Engage the core lightly, relax the shoulders, and breathe slowly while holding the stance.",
     tips: "Do not grip the floor with the toes or sink into a painful knee angle. Practice near a stable support if balance is uncertain.",
-    sourceRefs: [PDF_TAI_10, PDF_TAI_7, PDF_TAI_WALK, NHS_TAI_CHI],
+    sourceRefs: [NHS_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=jO0Y8e9phHg",
     displayOrder: 12,
   },
   {
@@ -1839,7 +1914,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand with feet shoulder-width apart and knees slightly bent. Raise the arms to shoulder height with palms facing each other as if holding a large ball. Keep the body stable and breathe slowly through the nose, maintaining the rounded arm shape without tension.",
     tips: "Lower the hands if the shoulders fatigue. Keep the breath comfortable instead of forcing a fixed count.",
-    sourceRefs: [PDF_TAI_10, VA_TAI_CHI],
+    sourceRefs: [VA_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=RjYa7ESYXkg",
     displayOrder: 13,
   },
   {
@@ -1854,7 +1930,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Sit tall near the front of a stable chair with feet flat and hands on the knees. Inhale while arching the back gently, lifting the chest and gaze. Exhale while rounding the back and bringing the chin toward the chest. Alternate slowly.",
     tips: "Move only through a comfortable spinal range and keep both feet grounded. The motion comes from the spine, not from pulling with the hands.",
-    sourceRefs: [PDF_CHAIR_TAI, NHS_CHAIR],
+    sourceRefs: [NHS_CHAIR],
+    video: "https://www.youtube.com/watch?v=M8c9LByNEtY",
     displayOrder: 14,
   },
   {
@@ -1869,7 +1946,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Sit tall on a stable chair with both feet flat. Lift one knee and hold it with both hands, drawing it gently toward the torso. While holding, slowly flex and point the foot. Lower the leg under control and repeat on the other side.",
     tips: "Keep the chest lifted instead of collapsing toward the knee. Hold behind the thigh rather than over the kneecap if the knee is sensitive.",
-    sourceRefs: [PDF_CHAIR_TAI, NHS_CHAIR],
+    sourceRefs: [NHS_CHAIR],
+    video: "https://www.youtube.com/watch?v=ytkZXFf4kaI",
     displayOrder: 15,
   },
   {
@@ -1884,7 +1962,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand facing the back of a stable chair and place both hands on it. Walk the feet back and hinge at the hips until the arms and spine form a long line. Keep the head between the arms and gaze toward the floor. Hold while breathing steadily.",
     tips: "Bend the knees to preserve a long, neutral back. Press the chair against a wall so it cannot slide.",
-    sourceRefs: [PDF_CHAIR_TAI, NHS_CHAIR],
+    sourceRefs: [NHS_CHAIR],
+    video: "https://www.youtube.com/watch?v=RWKx2dT_fUE",
     displayOrder: 16,
   },
   {
@@ -1899,7 +1978,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Place both hands on the seat of a stable chair and walk the feet back until the body forms a straight line from head to heels. Stack the shoulders over the wrists, brace the core and glutes, and hold with the neck neutral.",
     tips: "Press the chair against a wall before starting. Step closer to the chair to reduce difficulty and stop the hold when the hips begin to sag.",
-    sourceRefs: [PDF_CHAIR_TAI, ACE_PLANK],
+    sourceRefs: [ACE_PLANK],
+    video: "https://www.youtube.com/watch?v=QZluAPzqQXs",
     displayOrder: 17,
   },
   {
@@ -1914,7 +1994,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Place one hand on the seat of a stable chair. Step the feet back, turn the body sideways, and stagger the feet for support. Lift the top arm, open the chest, and hold with the hips lifted. Return carefully and repeat on the other side.",
     tips: "Press the chair against a wall. Keep the supporting shoulder away from the ear and use a wider staggered stance for more stability.",
-    sourceRefs: [PDF_CHAIR_TAI, ACE_PLANK],
+    sourceRefs: [ACE_PLANK],
+    video: "https://www.youtube.com/watch?v=FQJrPqE26gw",
     displayOrder: 18,
   },
   {
@@ -1929,7 +2010,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Sit tall on a stable chair. Bend one knee to about 90 degrees with the thigh turned outward and extend the other leg straight with the heel grounded. Keep the torso upright and extend both arms to the sides. Hold, return to center, and repeat on the other side.",
     tips: "Keep the bent knee aligned with the toes. Shorten the straight-leg position if the pelvis tilts or the lower back rounds.",
-    sourceRefs: [PDF_CHAIR_TAI, VA_TAI_CHI],
+    sourceRefs: [VA_TAI_CHI],
+    video: "https://www.youtube.com/watch?v=vT5MUMmbT68",
     displayOrder: 19,
   },
   {
@@ -1944,7 +2026,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand behind a stable chair with hands on the backrest. Shift weight onto one leg, extend the other leg behind, and hinge the torso forward. Keep the chest and hips facing the floor and form one long line through the lifted heel. Lower and repeat on the other side.",
     tips: "Keep both hands on the chair until balance is secure. Lift the rear leg only as high as possible without opening the hip.",
-    sourceRefs: [PDF_CHAIR_TAI, NHS_CHAIR],
+    sourceRefs: [NHS_CHAIR],
+    video: "https://www.youtube.com/watch?v=TyAa_sU9FtM",
     displayOrder: 20,
   },
   {
@@ -1959,7 +2042,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Stand tall beside a stable chair and hold the backrest with one hand. Bend the outside knee and hold that foot with the same-side hand. Draw the heel gently toward the glutes while keeping the knees close and pelvis slightly tucked. Release and switch sides.",
     tips: "Use a strap around the ankle if the foot is hard to reach. Do not pull the knee backward or arch the lower back.",
-    sourceRefs: [PDF_CHAIR_TAI, NHS_CHAIR],
+    sourceRefs: [NHS_CHAIR],
+    video: "https://www.youtube.com/watch?v=v7DtYL2nTxg",
     displayOrder: 21,
   },
   {
@@ -1974,7 +2058,8 @@ export const EXERCISES: Exercise[] = [
     instructions:
       "Sit tall on a stable chair. Extend both arms and both legs forward at comfortable heights. Make slow circles with the wrists and ankles together in one direction, then reverse the circles. Lower the limbs if posture starts to collapse.",
     tips: "Keep the circles small and pain-free. Extend one limb at a time if holding all four limbs up strains the lower back.",
-    sourceRefs: [PDF_CHAIR_TAI, NHS_CHAIR],
+    sourceRefs: [NHS_CHAIR],
+    video: "https://www.youtube.com/watch?v=QzgRg7HTGmg",
     displayOrder: 22,
   },
 ];

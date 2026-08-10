@@ -1,8 +1,8 @@
 ---
 id: apps-desktop-app
 source: apps/desktop/src/App.tsx
-updated: 2026-08-09
-depends_on: [apps-desktop-data-db, apps-desktop-data-schedule, apps-desktop-personalized-plan]
+updated: 2026-08-10
+depends_on: [apps-desktop-data-db, apps-desktop-data-schedule, apps-desktop-personalized-plan, apps-desktop-exercise-browser]
 status: current
 ---
 
@@ -36,6 +36,7 @@ export function App(): ReactNode;
 - Reset deletes the only local profile and plan for the installation.
 
 ## Related
+[[apps-desktop-exercise-browser]]
 [[apps-desktop-data-db]]
 [[apps-desktop-data-schedule]]
 [[apps-desktop-personalized-plan]]

@@ -230,9 +230,25 @@ function ExerciseCard({ exercise, isOpen, onToggle }: CardProps): React.JSX.Elem
   );
 }
 
+// Catalog stores shareable watch URLs; only the embed form loads in an iframe.
+// Every entry is currently a YouTube link, so nothing else is rendered.
+const YOUTUBE_ID = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
+
 function Detail({ exercise }: { exercise: Exercise }): React.JSX.Element {
+  const videoId = exercise.video ? YOUTUBE_ID.exec(exercise.video)?.[1] : undefined;
   return (
     <div style={styles.detail}>
+      {videoId ? (
+        <iframe
+          style={{ width: "100%", aspectRatio: "16 / 9", border: 0, borderRadius: 8 }}
+          src={`https://www.youtube.com/embed/${videoId}`}
+          title={`${exercise.name} demo`}
+          allow="accelerometer; encrypted-media; picture-in-picture"
+          allowFullScreen
+        />
+      ) : (
+        <span style={{ ...styles.meta, display: "block" }}>No video yet.</span>
+      )}
       <p style={{ margin: "0.4rem 0" }}>
         <strong>How:</strong> {exercise.instructions}
       </p>

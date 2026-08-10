@@ -1,7 +1,7 @@
 ---
 id: apps-desktop-data-db
 source: apps/desktop/src/data/db.ts, apps/desktop/src/data/schema.sql
-updated: 2026-08-09
+updated: 2026-08-10
 depends_on: [apps-desktop-data-exercises, apps-desktop-data-schedule]
 status: current
 ---
@@ -47,13 +47,14 @@ export function clearPersonalization(): Promise<void>;
 
 ## Behavior
 1. `ensureReady()` applies the idempotent schema and seeds categories before exercises.
-2. `loadPersonalization()` returns `none` when fixed row `id = 1` is absent.
-3. Loading parses and validates profile exclusions and fields before checking generator version or plan JSON.
-4. A valid profile with a non-current version returns `regeneration_required` with `unsupported_generator_version` without parsing the plan.
-5. A current row with malformed or structurally invalid plan JSON returns `regeneration_required` with `invalid_plan_json`.
-6. `savePersonalization()` serializes only exclusions and the plan, then replaces every saved field with one `INSERT ... ON CONFLICT(id) DO UPDATE` execution.
-7. Saving uses one ISO timestamp for `generated_at` and `updated_at` and returns the exact saved profile and plan.
-8. `clearPersonalization()` deletes only row `id = 1`.
+2. `migrate()` runs `ALTER TABLE exercises ADD COLUMN video TEXT` after the schema and swallows the resulting error on installs that already have the column.
+3. `loadPersonalization()` returns `none` when fixed row `id = 1` is absent.
+4. Loading parses and validates profile exclusions and fields before checking generator version or plan JSON.
+5. A valid profile with a non-current version returns `regeneration_required` with `unsupported_generator_version` without parsing the plan.
+6. A current row with malformed or structurally invalid plan JSON returns `regeneration_required` with `invalid_plan_json`.
+7. `savePersonalization()` serializes only exclusions and the plan, then replaces every saved field with one `INSERT ... ON CONFLICT(id) DO UPDATE` execution.
+8. Saving uses one ISO timestamp for `generated_at` and `updated_at` and returns the exact saved profile and plan.
+9. `clearPersonalization()` deletes only row `id = 1`.
 
 ## Invariants
 - At most one personalization row exists per installation.
