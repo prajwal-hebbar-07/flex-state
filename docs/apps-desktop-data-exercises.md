@@ -1,7 +1,7 @@
 ---
 id: apps-desktop-data-exercises
 source: apps/desktop/src/data/exercises.ts
-updated: 2026-08-08
+updated: 2026-08-09
 depends_on: []
 status: current
 ---
@@ -70,4 +70,6 @@ export const EXERCISES: Exercise[];
 - Renaming a category slug without migrating every exercise leaves records outside that category filter.
 
 ## Related
-None.
+[[apps-desktop-data-db]]
+[[apps-desktop-data-schedule]]
+[[apps-desktop-personalized-plan]]

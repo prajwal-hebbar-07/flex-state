@@ -24,3 +24,21 @@ CREATE TABLE IF NOT EXISTS exercises (
 
 CREATE INDEX IF NOT EXISTS idx_exercises_category ON exercises(category_slug);
 CREATE INDEX IF NOT EXISTS idx_exercises_equipment ON exercises(equipment);
+
+
+CREATE TABLE IF NOT EXISTS personalization (
+  id INTEGER PRIMARY KEY CHECK (id = 1),
+  primary_goal TEXT NOT NULL
+    CHECK (primary_goal IN ('general_fitness', 'strength', 'conditioning', 'mobility_balance')),
+  experience TEXT NOT NULL
+    CHECK (experience IN ('beginner', 'intermediate', 'advanced')),
+  days_per_week INTEGER NOT NULL CHECK (days_per_week BETWEEN 2 AND 7),
+  session_minutes INTEGER NOT NULL CHECK (session_minutes IN (15, 30, 45)),
+  has_dumbbells INTEGER NOT NULL CHECK (has_dumbbells IN (0, 1)),
+  low_impact_only INTEGER NOT NULL CHECK (low_impact_only IN (0, 1)),
+  excluded_exercise_slugs TEXT NOT NULL,
+  generator_version INTEGER NOT NULL,
+  plan_json TEXT NOT NULL,
+  generated_at TEXT NOT NULL,
+  updated_at TEXT NOT NULL
+);
