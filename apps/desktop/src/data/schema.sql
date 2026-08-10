@@ -52,3 +52,15 @@ CREATE TABLE IF NOT EXISTS personalization (
   generated_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );
+
+
+CREATE TABLE IF NOT EXISTS workout_completions (
+  completed_on TEXT PRIMARY KEY,
+  completed_at TEXT NOT NULL,
+  plan_day INTEGER NOT NULL CHECK (plan_day > 0),
+  session_title TEXT NOT NULL,
+  plan_name TEXT NOT NULL,
+  location_id TEXT NOT NULL,
+  duration_minutes INTEGER NOT NULL CHECK (duration_minutes > 0),
+  xp INTEGER NOT NULL CHECK (xp > 0)
+);

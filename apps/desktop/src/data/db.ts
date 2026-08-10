@@ -7,6 +7,7 @@ import {
   type Exercise,
 } from "./exercises";
 import { isLocation, LEGACY_LOCATION_NAME, type Location, normalizeLocationId } from "./locations";
+import { isWorkoutCompletion, type WorkoutCompletion } from "./progress";
 import {
   isPersonalizationProfile,
   isWeeklyPlan,
@@ -454,4 +455,64 @@ export async function savePersonalization(
 export async function clearPersonalization(): Promise<void> {
   const db = await getDb();
   await db.execute("DELETE FROM personalization WHERE id = 1");
+}
+
+interface DbWorkoutCompletionRow {
+  completed_on: string;
+  completed_at: string;
+  plan_day: number;
+  session_title: string;
+  plan_name: string;
+  location_id: string;
+  duration_minutes: number;
+  xp: number;
+}
+
+export async function listWorkoutCompletions(): Promise<WorkoutCompletion[]> {
+  const db = await getDb();
+  const rows = (await db.select<DbWorkoutCompletionRow[]>(
+    `SELECT completed_on, completed_at, plan_day, session_title, plan_name,
+            location_id, duration_minutes, xp
+     FROM workout_completions ORDER BY completed_on ASC`,
+  )) as unknown as DbWorkoutCompletionRow[];
+  const completions: WorkoutCompletion[] = [];
+  for (const row of rows) {
+    const completion: unknown = {
+      completedOn: row.completed_on,
+      completedAt: row.completed_at,
+      planDay: row.plan_day,
+      sessionTitle: row.session_title,
+      planName: row.plan_name,
+      locationId: row.location_id,
+      durationMinutes: row.duration_minutes,
+      xp: row.xp,
+    };
+    if (isWorkoutCompletion(completion)) completions.push(completion);
+    else console.warn(`Skipping malformed workout completion row "${row.completed_on}".`);
+  }
+  return completions;
+}
+
+export async function claimWorkoutCompletion(completion: WorkoutCompletion): Promise<boolean> {
+  if (!isWorkoutCompletion(completion)) {
+    throw new Error("Workout completion contains invalid values.");
+  }
+  const db = await getDb();
+  const result = await db.execute(
+    `INSERT OR IGNORE INTO workout_completions
+       (completed_on, completed_at, plan_day, session_title, plan_name,
+        location_id, duration_minutes, xp)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
+    [
+      completion.completedOn,
+      completion.completedAt,
+      completion.planDay,
+      completion.sessionTitle,
+      completion.planName,
+      completion.locationId,
+      completion.durationMinutes,
+      completion.xp,
+    ],
+  );
+  return result.rowsAffected === 1;
 }

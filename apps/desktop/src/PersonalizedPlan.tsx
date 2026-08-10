@@ -1,9 +1,10 @@
 import { Button } from "@flex-state/ui";
-import type { CSSProperties, FormEvent } from "react";
+import type { FormEvent } from "react";
 import * as React from "react";
 import type { SavedPersonalization } from "./data/db";
 import { EQUIPMENT_LABELS, type Exercise } from "./data/exercises";
 import type { Location } from "./data/locations";
+import type { PlayerProgress, WorkoutCompletion } from "./data/progress";
 import {
   type DaysPerWeek,
   formatPrescription,
@@ -13,6 +14,7 @@ import {
   resolvePlan,
   type SessionMinutes,
   type TrainingGoal,
+  type WorkoutDay,
 } from "./data/schedule";
 
 export interface ProfileFormProps {
@@ -30,6 +32,12 @@ export interface PlanViewProps {
   saved: SavedPersonalization;
   catalog: Exercise[];
   locations: Location[];
+  progress: PlayerProgress;
+  completions: WorkoutCompletion[];
+  todayCompletion?: WorkoutCompletion;
+  completing: boolean;
+  completionError: string | null;
+  onComplete: (day: WorkoutDay) => Promise<void>;
   onEdit: () => void;
   onRegenerate: () => void;
   onSwitchLocation: (locationId: string) => void;
@@ -51,97 +59,6 @@ const GOAL_LABELS: Record<TrainingGoal, string> = {
   strength: "Strength",
   conditioning: "Conditioning",
   mobility_balance: "Mobility & balance",
-};
-
-const styles: Record<string, CSSProperties> = {
-  wrap: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-    maxWidth: 960,
-    margin: "0 auto",
-    padding: "1rem",
-  },
-  form: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-    maxWidth: 720,
-  },
-  formGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))",
-    gap: "0.85rem",
-  },
-  field: { display: "flex", flexDirection: "column", gap: "0.35rem" },
-  select: {
-    padding: "0.5rem 0.65rem",
-    borderRadius: 6,
-    border: "1px solid #2a2a2a",
-    background: "#161616",
-    color: "#eee",
-  },
-  input: {
-    padding: "0.5rem 0.65rem",
-    borderRadius: 6,
-    border: "1px solid #2a2a2a",
-    background: "#161616",
-    color: "#eee",
-  },
-  checkbox: { display: "flex", gap: "0.5rem", alignItems: "center" },
-  fieldset: {
-    border: "1px solid #262626",
-    borderRadius: 10,
-    padding: "0.85rem",
-  },
-  checklist: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: "0.4rem 1rem",
-    marginTop: "0.75rem",
-  },
-  actions: { display: "flex", gap: "0.65rem", flexWrap: "wrap" },
-  error: {
-    color: "#fecaca",
-    background: "#450a0a",
-    border: "1px solid #7f1d1d",
-    borderRadius: 8,
-    padding: "0.75rem",
-  },
-  warning: {
-    color: "#fde68a",
-    background: "#422006",
-    border: "1px solid #854d0e",
-    borderRadius: 8,
-    padding: "0.75rem",
-  },
-  summary: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))",
-    gap: "0.75rem",
-  },
-  summaryItem: {
-    border: "1px solid #262626",
-    borderRadius: 8,
-    padding: "0.65rem",
-    background: "#141414",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))",
-    gap: "0.75rem",
-  },
-  card: {
-    border: "1px solid #262626",
-    borderRadius: 10,
-    padding: "0.85rem",
-    background: "#141414",
-  },
-  meta: { color: "#9aa0a6", fontSize: "0.82rem" },
-  exercise: {
-    borderTop: "1px solid #262626",
-    padding: "0.55rem 0",
-  },
 };
 
 export function ProfileForm({
@@ -171,20 +88,23 @@ export function ProfileForm({
   }
 
   return (
-    <section style={styles.wrap}>
-      <div>
-        <h2 style={{ marginBottom: "0.35rem" }}>Personalize your plan</h2>
-        <p style={styles.meta}>
-          Choose your goal and constraints. Your plan is generated offline and saved on this
-          installation.
+    <section className="screen-section content-narrow">
+      <header className="section-heading">
+        <p className="system-label">
+          {initialProfile ? "STATUS CONFIGURATION" : "AWAKENING 02 / 02"}
         </p>
-      </div>
-      <form style={styles.form} onSubmit={submit}>
-        <div style={styles.formGrid}>
-          <label style={styles.field}>
-            Primary goal
+        <h2>{initialProfile ? "Player Profile" : "Configure your player profile"}</h2>
+        <p>
+          Choose your fitness goal and training constraints. Your plan is generated offline and
+          saved on this installation.
+        </p>
+      </header>
+      <form className="system-panel form-stack" onSubmit={submit}>
+        <div className="form-grid">
+          <label className="form-field">
+            <span>Primary goal</span>
+            <small>Sets the main emphasis of each workout.</small>
             <select
-              style={styles.select}
               value={profile.primaryGoal}
               onChange={(event) =>
                 setProfile({
@@ -200,10 +120,10 @@ export function ProfileForm({
               ))}
             </select>
           </label>
-          <label style={styles.field}>
-            Experience
+          <label className="form-field">
+            <span>Experience</span>
+            <small>Keeps exercise selection appropriate.</small>
             <select
-              style={styles.select}
               value={profile.experience}
               onChange={(event) =>
                 setProfile({
@@ -217,10 +137,10 @@ export function ProfileForm({
               <option value="advanced">Advanced</option>
             </select>
           </label>
-          <label style={styles.field}>
-            Days/week
+          <label className="form-field">
+            <span>Days/week</span>
+            <small>Your weekly quest target.</small>
             <select
-              style={styles.select}
               value={profile.daysPerWeek}
               onChange={(event) =>
                 setProfile({
@@ -236,10 +156,10 @@ export function ProfileForm({
               ))}
             </select>
           </label>
-          <label style={styles.field}>
-            Session length
+          <label className="form-field">
+            <span>Session length</span>
+            <small>Controls each quest's duration and XP.</small>
             <select
-              style={styles.select}
               value={profile.sessionMinutes}
               onChange={(event) =>
                 setProfile({
@@ -255,10 +175,10 @@ export function ProfileForm({
               ))}
             </select>
           </label>
-          <label style={styles.field}>
-            Location
+          <label className="form-field">
+            <span>Location</span>
+            <small>Selects the equipment used for generation.</small>
             <select
-              style={styles.select}
               value={profile.locationId}
               onChange={(event) => setProfile({ ...profile, locationId: event.target.value })}
             >
@@ -271,7 +191,7 @@ export function ProfileForm({
           </label>
         </div>
 
-        <label style={styles.checkbox}>
+        <label className="checkbox-row">
           <input
             type="checkbox"
             checked={profile.lowImpactOnly}
@@ -281,19 +201,24 @@ export function ProfileForm({
         </label>
 
         {validationError || error ? (
-          <div role="alert" style={styles.error}>
+          <div role="alert" className="system-alert system-fault">
             {validationError ?? error}
           </div>
         ) : null}
-        <div style={styles.actions}>
+        <div className="button-row">
           <Button type="submit" disabled={saving}>
             {saving ? "Saving..." : submitLabel}
           </Button>
-          <Button type="button" onClick={onManageLocations} disabled={saving}>
-            Manage locations
+          <Button
+            type="button"
+            className="secondary-button"
+            onClick={onManageLocations}
+            disabled={saving}
+          >
+            Manage loadouts
           </Button>
           {onCancel ? (
-            <Button type="button" onClick={onCancel} disabled={saving}>
+            <Button type="button" className="secondary-button" onClick={onCancel} disabled={saving}>
               Cancel
             </Button>
           ) : null}
@@ -311,14 +236,14 @@ function PlanExercise({
   exercise: Exercise;
 }): React.JSX.Element {
   return (
-    <div style={styles.exercise}>
+    <div className="plan-exercise">
       <strong>{exercise.name}</strong>
       <div>{formatPrescription(item.prescription)}</div>
-      <div style={styles.meta}>
+      <div className="meta-text">
         {exercise.requires.map((kind) => EQUIPMENT_LABELS[kind]).join(" · ")} ·{" "}
         {exercise.difficulty} · {exercise.primaryMuscles.join(", ")}
       </div>
-      {item.notes ? <div style={{ marginTop: "0.25rem" }}>{item.notes}</div> : null}
+      {item.notes ? <div className="exercise-note">{item.notes}</div> : null}
     </div>
   );
 }
@@ -327,6 +252,12 @@ export function PlanView({
   saved,
   catalog,
   locations,
+  progress,
+  completions,
+  todayCompletion,
+  completing,
+  completionError,
+  onComplete,
   onEdit,
   onRegenerate,
   onSwitchLocation,
@@ -336,65 +267,59 @@ export function PlanView({
   const profile = saved.profile;
   const locationName =
     locations.find((location) => location.id === profile.locationId)?.name ?? profile.locationId;
+  const questDay = saved.plan.days[completions.length % saved.plan.days.length] as WorkoutDay;
+  const checklist = [
+    ...questDay.session.warmup.map((item, index) => ({
+      item,
+      section: "warmup",
+      key: `warmup-${index}-${item.slug}`,
+    })),
+    ...questDay.session.main.map((item, index) => ({
+      item,
+      section: "main",
+      key: `main-${index}-${item.slug}`,
+    })),
+  ];
+  const [checked, setChecked] = React.useState<Set<string>>(() => new Set());
+  const allChecked = checklist.length > 0 && checklist.every((entry) => checked.has(entry.key));
 
   return (
-    <section style={styles.wrap}>
-      <div style={styles.actions}>
-        <div style={{ flex: 1 }}>
-          <h2 style={{ marginBottom: "0.25rem" }}>{saved.plan.name}</h2>
-          <div style={styles.meta}>Generated {new Date(saved.generatedAt).toLocaleString()}</div>
+    <section className="screen-section">
+      <header className="quest-board-header">
+        <div>
+          <p className="system-label">QUEST BOARD</p>
+          <h2>{saved.plan.name}</h2>
+          <p className="meta-text">Generated {new Date(saved.generatedAt).toLocaleString()}</p>
         </div>
-        {/* Switching regenerates and saves in place, so the plan is never stale
-            relative to the selection. */}
-        <label style={styles.field}>
-          Location
-          <select
-            style={styles.select}
-            value={profile.locationId}
-            disabled={saving}
-            onChange={(event) => onSwitchLocation(event.target.value)}
-          >
-            {locations.map((location) => (
-              <option key={location.id} value={location.id}>
-                {location.name}
-              </option>
-            ))}
-          </select>
-        </label>
-        <Button onClick={onEdit}>Edit profile</Button>
-      </div>
-
-      <div style={styles.summary}>
-        <div style={styles.summaryItem}>
-          <strong>Goal</strong>
-          <div>{GOAL_LABELS[profile.primaryGoal]}</div>
+        <div className="quest-board-actions">
+          <label className="form-field compact-field">
+            <span>Active location</span>
+            <select
+              value={profile.locationId}
+              disabled={saving}
+              onChange={(event) => onSwitchLocation(event.target.value)}
+            >
+              {locations.map((location) => (
+                <option key={location.id} value={location.id}>
+                  {location.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <Button className="secondary-button" onClick={onEdit}>
+            Edit profile
+          </Button>
         </div>
-        <div style={styles.summaryItem}>
-          <strong>Experience</strong>
-          <div style={{ textTransform: "capitalize" }}>{profile.experience}</div>
-        </div>
-        <div style={styles.summaryItem}>
-          <strong>Schedule</strong>
-          <div>
-            {profile.daysPerWeek} days · {profile.sessionMinutes} min
-          </div>
-        </div>
-        <div style={styles.summaryItem}>
-          <strong>Constraints</strong>
-          <div>
-            {locationName}
-            {profile.lowImpactOnly ? " · Low impact" : ""}
-          </div>
-        </div>
-      </div>
+      </header>
 
       {saved.plan.warnings.map((warning) => (
         <div
           key={
             warning.code === "unknown_exclusion" ? warning.slug : `${warning.code}-${warning.day}`
           }
-          style={styles.warning}
+          className="system-panel system-warning"
         >
+          <p className="system-label">SYSTEM NOTICE</p>
           {warning.code === "unknown_exclusion"
             ? `Excluded exercise "${warning.slug}" is no longer in the catalog.`
             : warning.code === "duration_target_unmet"
@@ -404,41 +329,189 @@ export function PlanView({
       ))}
 
       {resolved.missing.length > 0 ? (
-        <div role="alert" style={styles.error}>
+        <div role="alert" className="system-panel system-fault">
+          <p className="system-label">SYSTEM FAULT</p>
           <strong>Saved plan references missing exercises</strong>
-          <div style={{ marginTop: "0.65rem" }}>
+          <div className="button-row">
             <Button onClick={onRegenerate}>Regenerate plan</Button>
           </div>
         </div>
       ) : (
-        <div style={styles.grid}>
-          {saved.plan.days.map(({ day, session }) => (
-            <article key={day} style={styles.card}>
-              <h3 style={{ marginTop: 0 }}>{session.title}</h3>
-              <div style={styles.meta}>
-                About {Math.round(session.estimatedDurationSec / 60)} min · Target{" "}
-                {session.targetDurationMin}
-                min
+        <>
+          <div className="quest-dashboard">
+            <aside className="system-panel player-status">
+              <p className="system-label">PLAYER STATUS</p>
+              <div className="rank-level">
+                <strong>Rank {progress.rank}</strong>
+                <strong>Level {progress.level}</strong>
               </div>
-              <h4>Warmup</h4>
-              {session.warmup.map((item) => (
-                <PlanExercise
-                  key={item.slug}
-                  item={item}
-                  exercise={resolved.bySlug.get(item.slug) as Exercise}
+              <label>
+                <span className="progress-label">
+                  <span>Level progress</span>
+                  <span>
+                    {progress.levelXp} / {progress.levelXpTarget} XP
+                  </span>
+                </span>
+                <progress value={progress.levelXp} max={progress.levelXpTarget} />
+              </label>
+              <dl className="status-list">
+                <div>
+                  <dt>Streak</dt>
+                  <dd>
+                    {progress.currentStreak > 0
+                      ? `${progress.currentStreak} days`
+                      : "Begin a new streak today"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>This week</dt>
+                  <dd>
+                    {progress.weeklyCompleted} / {profile.daysPerWeek} cleared
+                  </dd>
+                </div>
+                <div>
+                  <dt>Goal</dt>
+                  <dd>{GOAL_LABELS[profile.primaryGoal]}</dd>
+                </div>
+                <div>
+                  <dt>Experience</dt>
+                  <dd className="capitalize">{profile.experience}</dd>
+                </div>
+                <div>
+                  <dt>Location</dt>
+                  <dd>{locationName}</dd>
+                </div>
+              </dl>
+              <label>
+                <span className="progress-label">
+                  <span>Weekly progress</span>
+                  <span>
+                    {progress.weeklyCompleted} / {profile.daysPerWeek}
+                  </span>
+                </span>
+                <progress
+                  value={Math.min(progress.weeklyCompleted, profile.daysPerWeek)}
+                  max={profile.daysPerWeek}
                 />
-              ))}
-              <h4>Main workout</h4>
-              {session.main.map((item) => (
-                <PlanExercise
-                  key={item.slug}
-                  item={item}
-                  exercise={resolved.bySlug.get(item.slug) as Exercise}
-                />
-              ))}
+              </label>
+            </aside>
+
+            <article className="system-panel quest-card active-panel">
+              <div className="quest-title-row">
+                <div>
+                  <p className="system-label">TODAY&apos;S QUEST</p>
+                  <h3>{todayCompletion?.sessionTitle ?? questDay.session.title}</h3>
+                </div>
+                <strong className="xp-reward">
+                  +{todayCompletion?.xp ?? questDay.session.targetDurationMin * 10} XP
+                </strong>
+              </div>
+              {todayCompletion ? (
+                <div className="quest-cleared" aria-live="polite">
+                  <p className="system-label">QUEST CLEARED</p>
+                  <p>Completed {new Date(todayCompletion.completedAt).toLocaleString()}</p>
+                  <p>Recovery is part of progression. Return when you are ready.</p>
+                </div>
+              ) : (
+                <>
+                  <p className="meta-text">
+                    Day {questDay.day} · About{" "}
+                    {Math.round(questDay.session.estimatedDurationSec / 60)} min · {locationName}
+                  </p>
+                  <div className="quest-checklist">
+                    {checklist.map(({ item, section, key }) => (
+                      <label className="quest-check" key={key}>
+                        <input
+                          type="checkbox"
+                          checked={checked.has(key)}
+                          onChange={(event) =>
+                            setChecked((current) => {
+                              const next = new Set(current);
+                              if (event.target.checked) next.add(key);
+                              else next.delete(key);
+                              return next;
+                            })
+                          }
+                        />
+                        <span>
+                          <span className="system-label">
+                            {section === "warmup" ? "WARMUP" : "MAIN WORKOUT"}
+                          </span>
+                          <PlanExercise
+                            item={item}
+                            exercise={resolved.bySlug.get(item.slug) as Exercise}
+                          />
+                        </span>
+                      </label>
+                    ))}
+                  </div>
+                  {completionError ? (
+                    <div role="alert" className="system-alert system-fault">
+                      {completionError} Check your local database and retry.
+                    </div>
+                  ) : null}
+                  <Button
+                    className="clear-quest-button"
+                    disabled={!allChecked || completing}
+                    onClick={() => void onComplete(questDay)}
+                  >
+                    {completing
+                      ? "Clearing quest..."
+                      : `Clear Quest +${questDay.session.targetDurationMin * 10} XP`}
+                  </Button>
+                </>
+              )}
             </article>
-          ))}
-        </div>
+          </div>
+
+          <section className="quest-chain">
+            <div className="section-heading">
+              <p className="system-label">QUEST CHAIN</p>
+              <h3>Generated workout sequence</h3>
+            </div>
+            <div className="card-grid">
+              {saved.plan.days.map(({ day, session }) => {
+                const isCurrent = !todayCompletion && day === questDay.day;
+                const isClearedToday = todayCompletion?.planDay === day;
+                return (
+                  <article
+                    key={day}
+                    className={`system-panel quest-chain-card${isCurrent ? " current-quest" : ""}${
+                      isClearedToday ? " cleared-today" : ""
+                    }`}
+                  >
+                    <p className="system-label">
+                      DAY {day}
+                      {isCurrent ? " · CURRENT QUEST" : ""}
+                      {isClearedToday ? " · CLEARED TODAY" : ""}
+                    </p>
+                    <h3>{session.title}</h3>
+                    <p className="meta-text">
+                      About {Math.round(session.estimatedDurationSec / 60)} min · Target{" "}
+                      {session.targetDurationMin} min
+                    </p>
+                    <h4>Warmup</h4>
+                    {session.warmup.map((item) => (
+                      <PlanExercise
+                        key={`day-${day}-warmup-${item.slug}`}
+                        item={item}
+                        exercise={resolved.bySlug.get(item.slug) as Exercise}
+                      />
+                    ))}
+                    <h4>Main workout</h4>
+                    {session.main.map((item) => (
+                      <PlanExercise
+                        key={`day-${day}-main-${item.slug}`}
+                        item={item}
+                        exercise={resolved.bySlug.get(item.slug) as Exercise}
+                      />
+                    ))}
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        </>
       )}
     </section>
   );

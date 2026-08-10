@@ -94,3 +94,13 @@ boolean cannot represent two places, and a per-place exclusion list
 cannot be a global list. The eligibility check is a strict
 generalization of the v1 check, so the existing catalog and test
 expectations remain valid.
+
+
+
+## 2026-08-10 - Derive player progression from completion history
+
+Decision: Persist one validated `workout_completions` row per local completion date and derive total XP, level, rank, current streak, weekly count, and the next plan-day index from the full ordered history.
+
+Alternative rejected: Store a separate mutable progress summary or quest-cursor row beside completion history.
+
+Why: A second row could drift from the claims that produced it and would require transactional repair paths. The local-date primary key plus `INSERT OR IGNORE` makes rewards idempotent, while recomputing the small local history keeps SQLite as the single source of truth.

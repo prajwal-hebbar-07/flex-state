@@ -1,4 +1,3 @@
-import type { CSSProperties } from "react";
 import * as React from "react";
 import {
   type Category,
@@ -8,82 +7,6 @@ import {
   type Exercise,
   type SourceRef,
 } from "./data/exercises";
-
-const styles: Record<string, CSSProperties> = {
-  wrap: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-    maxWidth: 960,
-    margin: "0 auto",
-    padding: "1rem",
-  },
-  headerRow: {
-    display: "flex",
-    gap: "0.75rem",
-    flexWrap: "wrap",
-    alignItems: "center",
-  },
-  filterRow: {
-    display: "flex",
-    gap: "0.5rem",
-    flexWrap: "wrap",
-    alignItems: "center",
-  },
-  select: {
-    padding: "0.4rem 0.6rem",
-    borderRadius: 6,
-    border: "1px solid #2a2a2a",
-    background: "#161616",
-    color: "#eee",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
-    gap: "0.75rem",
-  },
-  card: {
-    border: "1px solid #262626",
-    borderRadius: 10,
-    padding: "0.85rem",
-    background: "#141414",
-  },
-  cardTitle: { margin: "0 0 0.25rem 0", fontSize: "1rem" },
-  meta: { color: "#9aa0a6", fontSize: "0.8rem", marginBottom: "0.5rem" },
-  detail: { marginTop: "0.5rem", fontSize: "0.85rem", color: "#cfcfcf" },
-  empty: { color: "#9aa0a6", textAlign: "center", padding: "2rem" },
-};
-
-function pillStyle(active: boolean): CSSProperties {
-  return {
-    padding: "0.35rem 0.75rem",
-    borderRadius: 999,
-    border: "1px solid #333",
-    background: active ? "#2563eb" : "#1a1a1a",
-    color: active ? "#fff" : "#ddd",
-    cursor: "pointer",
-    fontSize: "0.85rem",
-  };
-}
-
-function badgeStyle(color: string): CSSProperties {
-  return {
-    display: "inline-block",
-    padding: "0.1rem 0.5rem",
-    borderRadius: 6,
-    background: color,
-    color: "#0b0b0b",
-    fontSize: "0.72rem",
-    fontWeight: 600,
-    marginRight: "0.4rem",
-  };
-}
-
-const DIFFICULTY_COLOR: Record<Exercise["difficulty"], string> = {
-  beginner: "#34d399",
-  intermediate: "#fbbf24",
-  advanced: "#f87171",
-};
 
 type EquipmentFilter = EquipmentKind | "all";
 type DifficultyFilter = "all" | "beginner" | "intermediate" | "advanced";
@@ -110,75 +33,89 @@ export function ExerciseBrowser({ categories, exercises }: Props): React.JSX.Ele
   for (const e of exercises) counts[e.categorySlug] = (counts[e.categorySlug] ?? 0) + 1;
 
   return (
-    <div style={styles.wrap}>
-      <div style={styles.headerRow}>
-        <h2 style={{ margin: 0, fontSize: "1.4rem" }}>Home Workout Library</h2>
-        <span style={styles.meta}>
+    <section className="screen-section">
+      <header className="archive-header">
+        <div>
+          <p className="system-label">SKILL ARCHIVE</p>
+          <h2>Skill Archive</h2>
+          <p>Review movement technique before accepting a quest.</p>
+        </div>
+        <span className="result-count">
           {filtered.length} of {exercises.length} exercises
         </span>
-      </div>
+      </header>
 
-      <div style={styles.filterRow}>
-        <span style={styles.meta}>Category:</span>
+      <fieldset className="filter-group">
+        <legend className="filter-label">Category</legend>
         <button
           type="button"
-          style={pillStyle(categorySlug === null)}
+          className="system-tab"
+          aria-pressed={categorySlug === null}
           onClick={() => setCategorySlug(null)}
         >
           All ({exercises.length})
         </button>
-        {categories.map((c) => (
+        {categories.map((category) => (
           <button
             type="button"
-            key={c.slug}
-            style={pillStyle(categorySlug === c.slug)}
-            onClick={() => setCategorySlug(c.slug)}
+            className="system-tab"
+            aria-pressed={categorySlug === category.slug}
+            key={category.slug}
+            onClick={() => setCategorySlug(category.slug)}
           >
-            {c.name} ({counts[c.slug] ?? 0})
+            {category.name} ({counts[category.slug] ?? 0})
           </button>
         ))}
-      </div>
+      </fieldset>
 
-      <div style={styles.filterRow}>
-        <span style={styles.meta}>Equipment:</span>
-        {(["all", ...EQUIPMENT_KINDS] as EquipmentFilter[]).map((e) => (
+      <fieldset className="filter-group">
+        <legend className="visually-hidden">Equipment and difficulty filters</legend>
+        <span className="filter-label">Equipment</span>
+        {(["all", ...EQUIPMENT_KINDS] as EquipmentFilter[]).map((kind) => (
           <button
             type="button"
-            key={e}
-            style={pillStyle(equipment === e)}
-            onClick={() => setEquipment(e)}
+            className="filter-chip"
+            aria-pressed={equipment === kind}
+            key={kind}
+            onClick={() => setEquipment(kind)}
           >
-            {e === "all" ? "Any" : EQUIPMENT_LABELS[e]}
+            {kind === "all" ? "Any" : EQUIPMENT_LABELS[kind]}
           </button>
         ))}
-        <span style={{ ...styles.meta, marginLeft: "0.5rem" }}>Difficulty:</span>
-        {(["all", "beginner", "intermediate", "advanced"] as const).map((d) => (
+        <span className="filter-label filter-label-spaced">Difficulty</span>
+        {(["all", "beginner", "intermediate", "advanced"] as const).map((value) => (
           <button
             type="button"
-            key={d}
-            style={pillStyle(difficulty === d)}
-            onClick={() => setDifficulty(d)}
+            className="filter-chip"
+            aria-pressed={difficulty === value}
+            key={value}
+            onClick={() => setDifficulty(value)}
           >
-            {d === "all" ? "Any" : d}
+            {value === "all" ? "Any" : value}
           </button>
         ))}
-      </div>
+      </fieldset>
 
       {filtered.length === 0 ? (
-        <div style={styles.empty}>No exercises match those filters.</div>
+        <div className="system-panel empty-state">
+          <p className="system-label">NO SKILL RECORDS FOUND</p>
+          <p>No exercises match those filters.</p>
+        </div>
       ) : (
-        <div style={styles.grid}>
-          {filtered.map((ex) => (
+        <div className="card-grid skill-grid">
+          {filtered.map((exercise) => (
             <ExerciseCard
-              key={ex.slug}
-              exercise={ex}
-              isOpen={openSlug === ex.slug}
-              onToggle={() => setOpenSlug((prev) => (prev === ex.slug ? null : ex.slug))}
+              key={exercise.slug}
+              exercise={exercise}
+              isOpen={openSlug === exercise.slug}
+              onToggle={() =>
+                setOpenSlug((previous) => (previous === exercise.slug ? null : exercise.slug))
+              }
             />
           ))}
         </div>
       )}
-    </div>
+    </section>
   );
 }
 
@@ -190,35 +127,26 @@ interface CardProps {
 
 function ExerciseCard({ exercise, isOpen, onToggle }: CardProps): React.JSX.Element {
   return (
-    <div style={styles.card}>
-      <h3 style={styles.cardTitle}>{exercise.name}</h3>
-      <div style={styles.meta}>
+    <article className="system-panel skill-record">
+      <p className="system-label">SKILL RECORD</p>
+      <h3>{exercise.name}</h3>
+      <p className="meta-text">
         {exercise.subCategory ? `${exercise.subCategory} · ` : ""}
         Primary: {exercise.primaryMuscles.join(", ")}
-      </div>
-      <div>
-        <span style={badgeStyle("#93c5fd")}>
+      </p>
+      <div className="badge-row">
+        <span className="text-badge equipment-badge">
           {exercise.requires.map((kind) => EQUIPMENT_LABELS[kind]).join(" · ")}
         </span>
-        <span style={badgeStyle(DIFFICULTY_COLOR[exercise.difficulty])}>{exercise.difficulty}</span>
+        <span className={`text-badge difficulty-${exercise.difficulty}`}>
+          {exercise.difficulty}
+        </span>
       </div>
-      <button
-        type="button"
-        onClick={onToggle}
-        style={{
-          marginTop: "0.5rem",
-          background: "transparent",
-          color: "#60a5fa",
-          border: "none",
-          cursor: "pointer",
-          padding: 0,
-          fontSize: "0.85rem",
-        }}
-      >
+      <button type="button" className="detail-toggle" onClick={onToggle}>
         {isOpen ? "Hide details" : "Show details"}
       </button>
       {isOpen ? <Detail exercise={exercise} /> : null}
-    </div>
+    </article>
   );
 }
 
@@ -229,36 +157,36 @@ const YOUTUBE_ID = /(?:youtube\.com\/watch\?v=|youtu\.be\/)([\w-]{11})/;
 function Detail({ exercise }: { exercise: Exercise }): React.JSX.Element {
   const videoId = exercise.video ? YOUTUBE_ID.exec(exercise.video)?.[1] : undefined;
   return (
-    <div style={styles.detail}>
+    <div className="skill-detail">
       {videoId ? (
         <iframe
-          style={{ width: "100%", aspectRatio: "16 / 9", border: 0, borderRadius: 8 }}
+          className="exercise-video"
           src={`https://www.youtube.com/embed/${videoId}`}
           title={`${exercise.name} demo`}
           allow="accelerometer; encrypted-media; picture-in-picture"
           allowFullScreen
         />
       ) : (
-        <span style={{ ...styles.meta, display: "block" }}>No video yet.</span>
+        <span className="meta-text video-missing">No video yet.</span>
       )}
-      <p style={{ margin: "0.4rem 0" }}>
+      <p>
         <strong>How:</strong> {exercise.instructions}
       </p>
-      <p style={{ margin: "0.4rem 0" }}>
+      <p>
         <strong>Tips:</strong> {exercise.tips}
       </p>
-      <p style={{ margin: "0.4rem 0", color: "#9aa0a6" }}>
+      <p className="meta-text">
         <strong>Also works:</strong> {exercise.secondaryMuscles.join(", ")}
       </p>
       {exercise.sourceRefs.length > 0 ? (
-        <p style={{ margin: "0.4rem 0", fontSize: "0.75rem", color: "#777" }}>
+        <p className="source-list">
           Sources:{" "}
-          {exercise.sourceRefs.map((s: SourceRef, i: number) => (
-            <span key={s.url}>
-              <a href={s.url} target="_blank" rel="noreferrer">
-                {s.label}
+          {exercise.sourceRefs.map((source: SourceRef, index: number) => (
+            <span key={source.url}>
+              <a href={source.url} target="_blank" rel="noreferrer">
+                {source.label}
               </a>
-              {i < exercise.sourceRefs.length - 1 ? ", " : ""}
+              {index < exercise.sourceRefs.length - 1 ? ", " : ""}
             </span>
           ))}
         </p>

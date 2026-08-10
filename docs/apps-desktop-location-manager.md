@@ -7,7 +7,7 @@ status: current
 ---
 
 ## Purpose
-Creates, renames, re-equips, and deletes the places the user trains in, and holds the per-location exercise exclusion list. It is also the first-run screen: with zero locations it is the only thing the app renders.
+Renders first-run training-ground registration and later Loadout management while preserving per-location equipment, readiness, restrictions, rename, save, regeneration, and delete behavior.
 
 ## Contract
 
@@ -32,25 +32,23 @@ export function LocationManager(props: LocationManagerProps): React.JSX.Element;
 ```
 
 ## Behavior
-1. `firstRun` renders the heading `Where do you work out?`, the sub-line `Name each place and tick what you have there. You can add more later.`, and autofocuses the name input. Otherwise the heading is `Your locations`. It stays true for the whole of onboarding, not only while the list is empty.
-2. The exit button reads `Continue` under `firstRun` and `Done` otherwise. It is disabled while `locations` is empty, so first run cannot be skipped.
-3. Creating a location computes its id once as `normalizeLocationId(name)`, falling back to `` `location-${crypto.randomUUID().slice(0, 8)}` `` when that is `""`. `displayOrder` is `max(existing) + 1`. A new location starts with `equipment: ["bodyweight"]` and no exclusions.
-4. A blank or whitespace-only name reports `Type a name for this place.` Any other name is accepted, including punctuation-only and non-Latin scripts.
-5. An id that already exists reports `You already have a place called <existing name>.` The slug is never shown and the typed name is never rewritten.
-6. Each location renders as a card holding its name input, one equipment checkbox per `EQUIPMENT_KINDS` entry labelled from `EQUIPMENT_LABELS`, a readiness list, and a collapsed searchable exclusion checklist grouped by category.
-7. Card edits are local until `Save location`, which calls `onUpsert` with the draft.
-8. The readiness list runs `locationReadiness()` over the draft, so counts update as equipment is ticked. A focus with fewer than two eligible exercises renders in the warning colour and names the missing kinds.
-9. `Save location` is disabled while the draft fails `isLocation`, with the reason `Give this place a name and tick at least one thing you have here.` rendered above it.
-10. `Delete` confirms with `Delete this location?` and is disabled when the card is the active location, with the reason rendered beside it.
-11. The active location's card also offers `Regenerate plan`, which calls `onRegenerate`. Editing a location never regenerates on its own.
-12. Slugs excluded but absent from the catalog stay visible under `No longer in catalog` so the user can clear them.
-13. No database, network, or Tauri calls; every write goes through `onUpsert` / `onDelete`.
+1. `firstRun` renders `AWAKENING 01 / 02`, `Register your training grounds`, and autofocuses the name field. Later use renders `Loadouts`.
+2. The exit button remains `Continue` during first run and `Done` later, and cannot continue with zero locations.
+3. Creation computes the immutable id once, starts with bodyweight equipment and no restrictions, and preserves the existing duplicate/blank-name validation.
+4. Each loadout retains its local draft until `Save location`.
+5. Equipment is labelled `Available equipment`; readiness is labelled `Quest availability`; exclusions use `Restricted exercises (optional)`.
+6. `locationReadiness()` runs against the draft so counts and missing-equipment guidance update before save.
+7. The restriction search, category groups, unknown-slug cleanup, and no-match state are unchanged.
+8. Delete still confirms with `Delete this location?`, is disabled for the active location, and keeps the exact reason visible.
+9. The active loadout offers explicit regeneration; edits do not regenerate automatically.
+10. No database or Tauri calls; every write goes through the supplied callbacks.
 
 ## Invariants
-- The component never writes a name the user did not type. It has no default and no placeholder name.
-- A location's id is computed once at create time and is never recomputed on rename.
-- The equipment checklist and every equipment label come from `EQUIPMENT_KINDS` and `EQUIPMENT_LABELS`; no kind string is hardcoded here.
-- The exclusion fieldset exists only in this component. `ProfileForm` does not have one.
+- Location ids are created once and never change on rename.
+- The component never invents a display name.
+- Equipment options and labels come from the shared catalog constants.
+- The active loadout cannot be deleted in either the UI or database layer.
+- Exercise restrictions remain owned by locations, not the player profile.
 
 ## Gotchas
 - Two different names can collide on one id (`Nani's house` and `nanis house`). That is reported as an existing place, which is accurate but reads oddly when the names look different.

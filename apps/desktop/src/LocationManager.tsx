@@ -1,5 +1,5 @@
 import { Button } from "@flex-state/ui";
-import type { CSSProperties, FormEvent } from "react";
+import type { FormEvent } from "react";
 import * as React from "react";
 import {
   type Category,
@@ -26,52 +26,6 @@ export interface LocationManagerProps {
   error: string | null;
   saving: boolean;
 }
-
-const styles: Record<string, CSSProperties> = {
-  wrap: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "1rem",
-    maxWidth: 960,
-    margin: "0 auto",
-    padding: "1rem",
-  },
-  card: {
-    border: "1px solid #262626",
-    borderRadius: 10,
-    padding: "0.85rem",
-    background: "#141414",
-    display: "flex",
-    flexDirection: "column",
-    gap: "0.65rem",
-  },
-  field: { display: "flex", flexDirection: "column", gap: "0.35rem" },
-  input: {
-    padding: "0.5rem 0.65rem",
-    borderRadius: 6,
-    border: "1px solid #2a2a2a",
-    background: "#161616",
-    color: "#eee",
-  },
-  checkbox: { display: "flex", gap: "0.5rem", alignItems: "center" },
-  checklist: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-    gap: "0.4rem 1rem",
-    marginTop: "0.75rem",
-  },
-  fieldset: { border: "1px solid #262626", borderRadius: 10, padding: "0.85rem" },
-  actions: { display: "flex", gap: "0.65rem", flexWrap: "wrap", alignItems: "center" },
-  meta: { color: "#9aa0a6", fontSize: "0.82rem" },
-  warn: { color: "#fde68a", fontSize: "0.82rem" },
-  error: {
-    color: "#fecaca",
-    background: "#450a0a",
-    border: "1px solid #7f1d1d",
-    borderRadius: 8,
-    padding: "0.75rem",
-  },
-};
 
 export function LocationManager({
   locations,
@@ -119,31 +73,29 @@ export function LocationManager({
   }
 
   return (
-    <section style={styles.wrap}>
-      <div>
-        <h2 style={{ marginBottom: "0.35rem" }}>
-          {firstRun ? "Where do you work out?" : "Your locations"}
-        </h2>
-        <p style={styles.meta}>
+    <section className="screen-section content-narrow">
+      <header className="section-heading">
+        <p className="system-label">{firstRun ? "AWAKENING 01 / 02" : "LOADOUTS"}</p>
+        <h2>{firstRun ? "Register your training grounds" : "Loadouts"}</h2>
+        <p>
           {firstRun
-            ? "Name each place and tick what you have there. You can add more later."
-            : "Each place has its own equipment and its own excluded exercises."}
+            ? "Name each training ground and select the equipment available there. You can add more later."
+            : "Each training ground has its own equipment and exercise restrictions."}
         </p>
-      </div>
+      </header>
 
       {error ? (
-        <div role="alert" style={styles.error}>
+        <div role="alert" className="system-alert system-fault">
           {error}
         </div>
       ) : null}
 
-      <form style={styles.card} onSubmit={create}>
-        <label style={styles.field}>
-          Add a place
+      <form className="system-panel form-stack" onSubmit={create}>
+        <label className="form-field">
+          <span>Add a training ground</span>
           <input
             type="text"
             required
-            style={styles.input}
             value={name}
             placeholder="Garage, the park, Nani's house..."
             // biome-ignore lint/a11y/noAutofocus: first-run screen, the only field.
@@ -152,11 +104,11 @@ export function LocationManager({
           />
         </label>
         {createError ? (
-          <div role="alert" style={styles.error}>
+          <div role="alert" className="system-alert system-fault">
             {createError}
           </div>
         ) : null}
-        <div style={styles.actions}>
+        <div className="button-row">
           <Button type="submit" disabled={saving}>
             Add location
           </Button>
@@ -177,7 +129,7 @@ export function LocationManager({
         />
       ))}
 
-      <div style={styles.actions}>
+      <div className="button-row">
         <Button onClick={onClose} disabled={saving || locations.length === 0}>
           {firstRun ? "Continue" : "Done"}
         </Button>
@@ -241,23 +193,23 @@ function LocationCard({
   }
 
   return (
-    <div style={styles.card}>
-      <label style={styles.field}>
-        Name
+    <article className={`system-panel loadout-card${isActive ? " active-loadout" : ""}`}>
+      <p className="system-label">{isActive ? "ACTIVE LOADOUT" : "LOADOUT"}</p>
+      <label className="form-field">
+        <span>Name</span>
         <input
           type="text"
           required
-          style={styles.input}
           value={draft.name}
           onChange={(event) => setDraft({ ...draft, name: event.target.value })}
         />
       </label>
 
-      <div>
-        <strong>What is here</strong>
-        <div style={styles.checklist}>
+      <fieldset>
+        <legend>Available equipment</legend>
+        <div className="checkbox-grid">
           {EQUIPMENT_KINDS.map((kind) => (
-            <label key={kind} style={styles.checkbox}>
+            <label key={kind} className="checkbox-row">
               <input
                 type="checkbox"
                 checked={draft.equipment.includes(kind)}
@@ -267,41 +219,36 @@ function LocationCard({
             </label>
           ))}
         </div>
-      </div>
+      </fieldset>
 
-      <div>
-        <strong>What you can train here</strong>
+      <section className="readiness-panel" aria-label="Quest availability">
+        <h3>Quest availability</h3>
         {readiness.map((focus) => (
-          <div key={focus.focus} style={focus.eligible < 2 ? styles.warn : styles.meta}>
+          <div key={focus.focus} className={focus.eligible < 2 ? "readiness-warning" : "meta-text"}>
             {focus.label}: {focus.eligible} exercises
             {focus.eligible < 2 && focus.missing.length > 0
               ? ` - add ${focus.missing.map((kind) => EQUIPMENT_LABELS[kind]).join(" or ")}`
               : ""}
           </div>
         ))}
-      </div>
+      </section>
 
-      <details style={styles.fieldset}>
-        <summary>Exclude exercises here (optional)</summary>
-        <label style={{ ...styles.field, marginTop: "0.75rem" }}>
-          Search exercises
-          <input
-            type="search"
-            style={styles.input}
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-          />
+      <details className="restriction-panel">
+        <summary>Restricted exercises (optional)</summary>
+        <label className="form-field restriction-search">
+          <span>Search exercises</span>
+          <input type="search" value={search} onChange={(event) => setSearch(event.target.value)} />
         </label>
         {categories.map((category) => {
           const exercises = visibleCatalog.filter(
             (exercise) => exercise.categorySlug === category.slug,
           );
           return exercises.length > 0 ? (
-            <div key={category.slug}>
-              <h3 style={{ marginBottom: "0.35rem", fontSize: "1rem" }}>{category.name}</h3>
-              <div style={styles.checklist}>
+            <section key={category.slug}>
+              <h3>{category.name}</h3>
+              <div className="checkbox-grid">
                 {exercises.map((exercise) => (
-                  <label key={exercise.slug} style={styles.checkbox}>
+                  <label key={exercise.slug} className="checkbox-row">
                     <input
                       type="checkbox"
                       checked={draft.excludedExerciseSlugs.includes(exercise.slug)}
@@ -311,36 +258,37 @@ function LocationCard({
                   </label>
                 ))}
               </div>
-            </div>
+            </section>
           ) : null;
         })}
         {visibleCatalog.length === 0 ? (
-          <p style={styles.meta}>No exercises match that search.</p>
+          <p className="meta-text">No exercises match that search.</p>
         ) : null}
         {unknownExclusions.length > 0 ? (
-          <div>
-            <h3 style={{ marginBottom: "0.35rem", fontSize: "1rem" }}>No longer in catalog</h3>
+          <section>
+            <h3>No longer in catalog</h3>
             {unknownExclusions.map((slug) => (
-              <label key={slug} style={styles.checkbox}>
+              <label key={slug} className="checkbox-row">
                 <input type="checkbox" checked onChange={() => toggleExclusion(slug, false)} />
                 {slug}
               </label>
             ))}
-          </div>
+          </section>
         ) : null}
       </details>
 
       {isLocation(draft) ? null : (
-        <div role="alert" style={styles.error}>
+        <div role="alert" className="system-alert system-fault">
           Give this place a name and tick at least one thing you have here.
         </div>
       )}
 
-      <div style={styles.actions}>
+      <div className="button-row">
         <Button onClick={() => onUpsert(draft)} disabled={saving || !isLocation(draft)}>
           Save location
         </Button>
         <Button
+          className="danger-button"
           onClick={() => {
             if (window.confirm("Delete this location?")) void onDelete(location.id);
           }}
@@ -350,15 +298,15 @@ function LocationCard({
         </Button>
         {isActive ? (
           <>
-            <span style={styles.meta}>
+            <span className="meta-text">
               Your saved plan uses this place, so it cannot be deleted.
             </span>
-            <Button onClick={onRegenerate} disabled={saving}>
+            <Button className="secondary-button" onClick={onRegenerate} disabled={saving}>
               Regenerate plan
             </Button>
           </>
         ) : null}
       </div>
-    </div>
+    </article>
   );
 }

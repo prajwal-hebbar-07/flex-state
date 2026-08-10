@@ -7,7 +7,7 @@ status: current
 ---
 
 ## Purpose
-Renders the full exercise catalog as a filterable card grid and expands one card at a time into a detail pane holding the demo video, instructions, tips, and sources.
+Renders the Skill Archive as filterable Skill Record panels and expands one record at a time into its demo video, instructions, tips, muscles, and sources.
 
 ## Contract
 
@@ -21,21 +21,20 @@ export function ExerciseBrowser({ categories, exercises }: Props): React.JSX.Ele
 ```
 
 ## Behavior
-1. Renders every exercise in `exercises` that passes the category, equipment, and difficulty filters.
-2. The category filter defaults to `null`, meaning all categories.
-3. The equipment filter offers `Any` plus one pill per `EQUIPMENT_KINDS` entry, labelled with `EQUIPMENT_LABELS`, and matches an exercise whose `requires` includes the selected kind.
-4. The difficulty filter matches on exact equality.
-5. At most one card is expanded; clicking the open card's toggle closes it.
-6. An expanded card renders a `https://www.youtube.com/embed/<id>` iframe built from the record's `video` URL.
-7. A record whose `video` is absent or is not a YouTube watch or `youtu.be` URL renders the text `No video yet.` instead of a player.
-8. The sources line is omitted entirely when `sourceRefs` is empty.
-9. A card's equipment badge renders every `EQUIPMENT_LABELS` value for that record's `requires`, joined with ` · `.
-10. No network, database, or Tauri calls; every input arrives through props.
+1. Renders every exercise passing the category, equipment, and difficulty filters and preserves the result count.
+2. Category controls use System tabs; equipment and difficulty use compact filter chips. Every control exposes selection through `aria-pressed`.
+3. Equipment filtering matches records whose `requires` includes the selected `EQUIPMENT_KINDS` value; difficulty uses exact equality.
+4. At most one Skill Record is expanded; clicking its toggle again closes it.
+5. An expanded record converts a supported YouTube watch URL to `https://www.youtube.com/embed/<id>`.
+6. Missing or unsupported video URLs render `No video yet.` and empty `sourceRefs` omit the sources line.
+7. Equipment and difficulty remain text badges; difficulty is not mapped to player rank.
+8. No database or Tauri calls; all inputs arrive through props.
 
 ## Invariants
-- The video URL is never rendered as-is in the `src`; only the 11-character id extracted by `YOUTUBE_ID` reaches the iframe.
-- Filtering never mutates `exercises`.
-- Exercise order is the order of the `exercises` prop.
+- Filter state is local and never mutates the supplied catalog.
+- The raw video URL is never used as iframe `src`; only the extracted 11-character id is embedded.
+- Exercise order follows the `exercises` prop.
+- Empty results preserve every filter control.
 
 ## Gotchas
 - The equipment filter is approximate for the 71 exercises outside the planner pools: their furniture and floor needs are not modelled. See [[apps-desktop-data-exercises]].

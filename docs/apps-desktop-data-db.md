@@ -2,12 +2,12 @@
 id: apps-desktop-data-db
 source: apps/desktop/src/data/db.ts, apps/desktop/src/data/schema.sql
 updated: 2026-08-10
-depends_on: [apps-desktop-data-exercises, apps-desktop-data-schedule, apps-desktop-data-locations]
+depends_on: [apps-desktop-data-exercises, apps-desktop-data-progress, apps-desktop-data-schedule, apps-desktop-data-locations]
 status: current
 ---
 
 ## Purpose
-Owns the Tauri SQLite connection, idempotent catalog setup, catalog queries, and the single locally persisted personalization profile and plan snapshot.
+Owns the Tauri SQLite connection, idempotent schema/catalog setup, locations, the single personalization snapshot, and append-only daily workout completion claims.
 
 ## Contract
 
@@ -46,6 +46,8 @@ export function savePersonalization(
   plan: WeeklyPlan,
 ): Promise<SavedPersonalization>;
 export function clearPersonalization(): Promise<void>;
+export function listWorkoutCompletions(): Promise<WorkoutCompletion[]>;
+export function claimWorkoutCompletion(completion: WorkoutCompletion): Promise<boolean>;
 ```
 
 ## Behavior
@@ -69,6 +71,10 @@ export function clearPersonalization(): Promise<void>;
 18. Saving uses one ISO timestamp for `generated_at` and `updated_at` and returns the exact saved profile and plan.
 19. `clearPersonalization()` deletes only row `id = 1`.
 
+20. `workout_completions.completed_on` is the local-date primary key and has no location foreign key, so one date can award XP once and historical rows survive location deletion.
+21. `listWorkoutCompletions()` selects explicit columns in date order, maps them to camelCase, validates with `isWorkoutCompletion()`, and warns before skipping malformed rows.
+22. `claimWorkoutCompletion()` validates its input and uses `INSERT OR IGNORE`; `rowsAffected === 1` means the claim was inserted and `false` means that local date already existed.
+
 ## Invariants
 - At most one personalization row exists per installation.
 - Fresh and upgraded installs end with the same `personalization` and `locations` shape.
@@ -78,6 +84,8 @@ export function clearPersonalization(): Promise<void>;
 - Invalid profile data takes precedence over stale version and invalid plan data.
 - Launch loading never regenerates or overwrites a snapshot.
 - A non-current plan passed to `savePersonalization()` throws `Error("Cannot save a plan from an unsupported generator version.")`.
+- Completion history is the only persisted progression state; XP, level, rank, streak, weekly count, and quest cursor are derived.
+- `clearPersonalization()` never deletes workout completions.
 
 ## Gotchas
 - `migrateLegacyPersonalization()` runs at most once per installation, guarded by a `SELECT` that fails once the rebuild has happened. It is the only code that creates a location the user did not name, and only on a v1 install that had a saved profile.
@@ -86,9 +94,11 @@ export function clearPersonalization(): Promise<void>;
 - The installed SQL plugin exposes pooled `execute()` calls but no transaction object; multiple calls are not an atomic replacement.
 - `clearPersonalization()` is destructive and is reserved for the confirmed reset action in `App`.
 - Catalog seeding uses `INSERT OR REPLACE`, so source catalog records remain authoritative for exercise details.
+- Completion rows intentionally retain location ids that may no longer resolve.
 
 ## Related
 [[apps-desktop-data-exercises]]
 [[apps-desktop-data-locations]]
 [[apps-desktop-data-schedule]]
+[[apps-desktop-data-progress]]
 [[apps-desktop-app]]
