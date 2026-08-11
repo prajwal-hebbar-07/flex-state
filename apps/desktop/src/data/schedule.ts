@@ -6,16 +6,18 @@ import {
 } from "./exercises.ts";
 import { equipmentCovers, type Location } from "./locations.ts";
 
-export const PERSONALIZATION_GENERATOR_VERSION = 2 as const;
+export const PERSONALIZATION_GENERATOR_VERSION = 3 as const;
 
 export type TrainingGoal = "general_fitness" | "strength" | "conditioning" | "mobility_balance";
 export type DaysPerWeek = 2 | 3 | 4 | 5 | 6 | 7;
 export type SessionMinutes = 15 | 30 | 45;
 export type PlanFocus = "lower" | "upper" | "core" | "full_body" | "mobility_balance";
+export type BodyFocus = Extract<PlanFocus, "lower" | "upper" | "core">;
 export type Impact = "low" | "high";
 
 export interface PersonalizationProfile {
   primaryGoal: TrainingGoal;
+  bodyFocuses: BodyFocus[];
   experience: Difficulty;
   daysPerWeek: DaysPerWeek;
   sessionMinutes: SessionMinutes;
@@ -87,6 +89,7 @@ interface PlanCandidate extends PrescribedExercise {
 }
 
 const GOALS: TrainingGoal[] = ["general_fitness", "strength", "conditioning", "mobility_balance"];
+const BODY_FOCUSES: BodyFocus[] = ["lower", "upper", "core"];
 const DIFFICULTIES: Difficulty[] = ["beginner", "intermediate", "advanced"];
 const DAYS_PER_WEEK: DaysPerWeek[] = [2, 3, 4, 5, 6, 7];
 const SESSION_MINUTES: SessionMinutes[] = [15, 30, 45];
@@ -95,7 +98,7 @@ const FOCUSES: PlanFocus[] = ["lower", "upper", "core", "full_body", "mobility_b
 const GOAL_LABELS: Record<TrainingGoal, string> = {
   general_fitness: "General fitness",
   strength: "Strength",
-  conditioning: "Conditioning",
+  conditioning: "Fat loss & conditioning",
   mobility_balance: "Mobility & balance",
 };
 
@@ -245,6 +248,7 @@ export function isPersonalizationProfile(value: unknown): value is Personalizati
   if (typeof value !== "object" || value === null) return false;
   const profile = value as {
     primaryGoal?: unknown;
+    bodyFocuses?: unknown;
     experience?: unknown;
     daysPerWeek?: unknown;
     sessionMinutes?: unknown;
@@ -253,6 +257,10 @@ export function isPersonalizationProfile(value: unknown): value is Personalizati
   };
   return (
     isOneOf(profile.primaryGoal, GOALS) &&
+    Array.isArray(profile.bodyFocuses) &&
+    profile.bodyFocuses.length <= BODY_FOCUSES.length &&
+    profile.bodyFocuses.every((focus) => isOneOf(focus, BODY_FOCUSES)) &&
+    new Set(profile.bodyFocuses).size === profile.bodyFocuses.length &&
     isOneOf(profile.experience, DIFFICULTIES) &&
     isOneOf(profile.daysPerWeek, DAYS_PER_WEEK) &&
     isOneOf(profile.sessionMinutes, SESSION_MINUTES) &&
@@ -383,7 +391,16 @@ export function formatPrescription(prescription: Prescription): string {
 }
 
 const selectedFocuses = (profile: PersonalizationProfile): PlanFocus[] => {
-  const cycle = FOCUS_CYCLES[profile.primaryGoal];
+  const goalCycle = FOCUS_CYCLES[profile.primaryGoal];
+  const cycle: PlanFocus[] =
+    profile.bodyFocuses.length === 0
+      ? goalCycle
+      : [
+          ...profile.bodyFocuses,
+          ...goalCycle.filter(
+            (focus) => !profile.bodyFocuses.some((bodyFocus) => bodyFocus === focus),
+          ),
+        ];
   return Array.from(
     { length: profile.daysPerWeek },
     (_, index) => cycle[index % cycle.length] as PlanFocus,

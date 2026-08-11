@@ -1,7 +1,7 @@
 ---
 id: apps-desktop-personalized-plan
 source: apps/desktop/src/PersonalizedPlan.tsx
-updated: 2026-08-10
+updated: 2026-08-11
 depends_on: [apps-desktop-data-db, apps-desktop-data-progress, apps-desktop-data-exercises, apps-desktop-data-schedule, apps-desktop-data-locations]
 status: current
 ---
@@ -44,7 +44,7 @@ export function PlanView(props: PlanViewProps): React.JSX.Element;
 ```
 
 ## Behavior
-1. `ProfileForm` keeps the existing controlled goal, experience, days, duration, location, and low-impact fields. No profile fields were added.
+1. `ProfileForm` keeps controlled goal, body-focus, experience, days, duration, location, and low-impact fields. Body focus can prioritize core, upper-body, and lower-body sessions independently.
 2. No initial profile renders `AWAKENING 02 / 02`; later edits render `Player Profile`.
 3. Submission validates the complete profile, awaits `onSubmit()`, disables actions while saving, and preserves values after errors.
 4. `PlanView` resolves the saved plan once through `resolvePlan()`. Any missing slug blocks completion and offers regeneration.
@@ -61,7 +61,7 @@ export function PlanView(props: PlanViewProps): React.JSX.Element;
 - `PlanView` never writes SQLite and never manufactures completion rows.
 - Quest Chain cards are informational; only Today's Quest can call `onComplete`.
 - Missing plan exercises are never omitted and always block completion.
-- `ProfileForm` takes no catalog or category prop and collects no medical or body data.
+- `ProfileForm` collects preferences only; it collects no body measurements or medical data and does not claim that exercise can target fat loss in one area.
 - Location switching still regenerates and saves immediately.
 
 ## Gotchas

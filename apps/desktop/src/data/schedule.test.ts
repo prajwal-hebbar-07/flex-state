@@ -33,6 +33,7 @@ const officeLocation: Location = {
 
 const baseProfile: PersonalizationProfile = {
   primaryGoal: "general_fitness",
+  bodyFocuses: [],
   experience: "advanced",
   daysPerWeek: 3,
   sessionMinutes: 15,
@@ -111,6 +112,25 @@ test("goals repeat their exact focus cycles", () => {
       (day) => day.session.focus,
     ),
     Array(7).fill("mobility_balance"),
+  );
+});
+
+test("selected body focuses are prioritized before the primary goal cycle", () => {
+  assert.deepEqual(
+    planFor({
+      primaryGoal: "general_fitness",
+      bodyFocuses: ["core", "upper", "lower"],
+      daysPerWeek: 4,
+    }).days.map((day) => day.session.focus),
+    ["core", "upper", "lower", "full_body"],
+  );
+  assert.deepEqual(
+    planFor({
+      primaryGoal: "conditioning",
+      bodyFocuses: ["core"],
+      daysPerWeek: 3,
+    }).days.map((day) => day.session.focus),
+    ["core", "full_body", "core"],
   );
 });
 

@@ -48,6 +48,9 @@ export async function migrate(): Promise<void> {
   // CREATE TABLE IF NOT EXISTS is a no-op on installs made before `video` existed,
   // so add it separately. Throws "duplicate column name" once it is there.
   await db.execute("ALTER TABLE exercises ADD COLUMN video TEXT").catch(() => {});
+  await db
+    .execute("ALTER TABLE personalization ADD COLUMN body_focuses TEXT NOT NULL DEFAULT '[]'")
+    .catch(() => {});
 }
 
 export async function seed(): Promise<void> {
@@ -217,6 +220,7 @@ async function migrateLegacyPersonalization(): Promise<void> {
     CREATE TABLE personalization_v2 (
       id INTEGER PRIMARY KEY CHECK (id = 1),
       primary_goal TEXT NOT NULL,
+      body_focuses TEXT NOT NULL,
       experience TEXT NOT NULL,
       days_per_week INTEGER NOT NULL,
       session_minutes INTEGER NOT NULL,
@@ -228,7 +232,7 @@ async function migrateLegacyPersonalization(): Promise<void> {
       updated_at TEXT NOT NULL
     );
     INSERT INTO personalization_v2
-      SELECT id, primary_goal, experience, days_per_week, session_minutes,
+      SELECT id, primary_goal, '[]', experience, days_per_week, session_minutes,
              low_impact_only, '${legacyId}', generator_version,
              plan_json, generated_at, updated_at
       FROM personalization;
@@ -325,6 +329,7 @@ export type PersonalizationLoadResult =
 
 interface DbPersonalizationRow {
   primary_goal: unknown;
+  body_focuses: unknown;
   experience: unknown;
   days_per_week: unknown;
   session_minutes: unknown;
@@ -339,7 +344,7 @@ interface DbPersonalizationRow {
 export async function loadPersonalization(): Promise<PersonalizationLoadResult> {
   const db = await getDb();
   const rows = (await db.select<DbPersonalizationRow[]>(
-    `SELECT primary_goal, experience, days_per_week, session_minutes,
+    `SELECT primary_goal, body_focuses, experience, days_per_week, session_minutes,
       low_impact_only, location_id,
       generator_version, plan_json, generated_at, updated_at
     FROM personalization WHERE id = 1`,
@@ -347,8 +352,20 @@ export async function loadPersonalization(): Promise<PersonalizationLoadResult> 
   const row = rows[0];
   if (!row) return { kind: "none" };
 
+  let bodyFocuses: unknown;
+  try {
+    if (typeof row.body_focuses !== "string") throw new TypeError("Expected body focuses JSON.");
+    bodyFocuses = JSON.parse(row.body_focuses);
+  } catch {
+    return {
+      kind: "invalid_profile",
+      message: "Saved personalization profile is invalid.",
+    };
+  }
+
   const profileValue = {
     primaryGoal: row.primary_goal,
+    bodyFocuses,
     experience: row.experience,
     daysPerWeek: row.days_per_week,
     sessionMinutes: row.session_minutes,
@@ -415,12 +432,13 @@ export async function savePersonalization(
   const timestamp = new Date().toISOString();
   await db.execute(
     `INSERT INTO personalization (
-      id, primary_goal, experience, days_per_week, session_minutes,
+      id, primary_goal, body_focuses, experience, days_per_week, session_minutes,
       low_impact_only, location_id,
       generator_version, plan_json, generated_at, updated_at
-    ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+    ) VALUES (1, $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
     ON CONFLICT(id) DO UPDATE SET
       primary_goal = excluded.primary_goal,
+      body_focuses = excluded.body_focuses,
       experience = excluded.experience,
       days_per_week = excluded.days_per_week,
       session_minutes = excluded.session_minutes,
@@ -432,6 +450,7 @@ export async function savePersonalization(
       updated_at = excluded.updated_at`,
     [
       profile.primaryGoal,
+      JSON.stringify(profile.bodyFocuses),
       profile.experience,
       profile.daysPerWeek,
       profile.sessionMinutes,

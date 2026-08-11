@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS personalization (
   id INTEGER PRIMARY KEY CHECK (id = 1),
   primary_goal TEXT NOT NULL
     CHECK (primary_goal IN ('general_fitness', 'strength', 'conditioning', 'mobility_balance')),
+  body_focuses TEXT NOT NULL DEFAULT '[]',
   experience TEXT NOT NULL
     CHECK (experience IN ('beginner', 'intermediate', 'advanced')),
   days_per_week INTEGER NOT NULL CHECK (days_per_week BETWEEN 2 AND 7),

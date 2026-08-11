@@ -1,7 +1,7 @@
 ---
 id: apps-desktop-data-schedule
 source: apps/desktop/src/data/schedule.ts, apps/desktop/src/data/schedule.test.ts, apps/desktop/package.json, apps/desktop/tsconfig.json
-updated: 2026-08-10
+updated: 2026-08-11
 depends_on: [apps-desktop-data-exercises, apps-desktop-data-locations]
 status: current
 ---
@@ -12,15 +12,17 @@ Defines the versioned offline personalization profile, deterministic weekly-plan
 ## Contract
 
 ```ts
-export const PERSONALIZATION_GENERATOR_VERSION = 2 as const;
+export const PERSONALIZATION_GENERATOR_VERSION = 3 as const;
 export type TrainingGoal = "general_fitness" | "strength" | "conditioning" | "mobility_balance";
 export type DaysPerWeek = 2 | 3 | 4 | 5 | 6 | 7;
 export type SessionMinutes = 15 | 30 | 45;
 export type PlanFocus = "lower" | "upper" | "core" | "full_body" | "mobility_balance";
+export type BodyFocus = Extract<PlanFocus, "lower" | "upper" | "core">;
 export type Impact = "low" | "high";
 
 export interface PersonalizationProfile {
   primaryGoal: TrainingGoal;
+  bodyFocuses: BodyFocus[];
   experience: Difficulty;
   daysPerWeek: DaysPerWeek;
   sessionMinutes: SessionMinutes;
@@ -112,7 +114,7 @@ export function sessionDurationSec(session: WorkoutSession): number;
 ## Behavior
 1. `generateWeeklyPlan()` validates the complete profile and returns one `invalid_profile` issue for any invalid value.
 2. Generation resolves `profile.locationId` against the `locations` argument and returns one `location_missing` issue carrying that id when nothing matches.
-3. Generation validates every candidate slug needed by the selected focus cycle before applying profile filters and reports unique catalog gaps in candidate order.
+3. Generation prioritizes the selected `bodyFocuses` in profile order, then fills remaining days from the primary goal cycle without duplicating those priorities in the same cycle.
 4. Difficulty, equipment, high impact, and exact-slug exclusions are hard filters for warmups and main exercises. Equipment passes when `equipmentCovers(location.equipment, exercise.requires)` holds; exclusions come from `location.excludedExerciseSlugs`, not from the profile.
 5. Each session uses the first two eligible warmups and at least two unique main exercises, preferring main slugs not used earlier in the week.
 6. The generator adds later main candidates only while the estimated session remains within the requested duration; the mandatory first two may exceed it.
@@ -124,7 +126,7 @@ export function sessionDurationSec(session: WorkoutSession): number;
 12. Generation uses ordered pools and no randomness, clock, network, account, or AI service.
 
 ## Invariants
-- Generator version `2` is embedded in every valid snapshot.
+- Generator version `3` is embedded in every valid snapshot.
 - Identical profile and catalog inputs produce deeply equal plan objects.
 - A main slug occurs at most once in a session.
 - Filters are never relaxed to satisfy exercise count or duration.

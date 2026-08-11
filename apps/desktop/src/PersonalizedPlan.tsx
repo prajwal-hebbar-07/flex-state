@@ -6,6 +6,7 @@ import { EQUIPMENT_LABELS, type Exercise } from "./data/exercises";
 import type { Location } from "./data/locations";
 import type { PlayerProgress, WorkoutCompletion } from "./data/progress";
 import {
+  type BodyFocus,
   type DaysPerWeek,
   formatPrescription,
   isPersonalizationProfile,
@@ -48,6 +49,7 @@ export interface PlanViewProps {
 // first user-created one, and App never renders it with an empty list.
 const DEFAULT_PROFILE: Omit<PersonalizationProfile, "locationId"> = {
   primaryGoal: "general_fitness",
+  bodyFocuses: [],
   experience: "beginner",
   daysPerWeek: 3,
   sessionMinutes: 15,
@@ -57,9 +59,15 @@ const DEFAULT_PROFILE: Omit<PersonalizationProfile, "locationId"> = {
 const GOAL_LABELS: Record<TrainingGoal, string> = {
   general_fitness: "General fitness",
   strength: "Strength",
-  conditioning: "Conditioning",
+  conditioning: "Fat loss & conditioning",
   mobility_balance: "Mobility & balance",
 };
+
+const BODY_FOCUS_OPTIONS: { value: BodyFocus; label: string }[] = [
+  { value: "core", label: "Stronger core & midsection" },
+  { value: "upper", label: "Stronger arms & upper body" },
+  { value: "lower", label: "Stronger legs & lower body" },
+];
 
 export function ProfileForm({
   locations,
@@ -190,6 +198,33 @@ export function ProfileForm({
             </select>
           </label>
         </div>
+
+        <fieldset>
+          <legend>Body focus</legend>
+          <p className="meta-text">
+            Choose any areas you want prioritized. Fat loss happens across the whole body; core
+            training strengthens your midsection but cannot target stomach fat by itself.
+          </p>
+          <div className="checkbox-grid">
+            {BODY_FOCUS_OPTIONS.map(({ value, label }) => (
+              <label className="checkbox-row" key={value}>
+                <input
+                  type="checkbox"
+                  checked={profile.bodyFocuses.includes(value)}
+                  onChange={(event) =>
+                    setProfile({
+                      ...profile,
+                      bodyFocuses: event.target.checked
+                        ? [...profile.bodyFocuses, value]
+                        : profile.bodyFocuses.filter((focus) => focus !== value),
+                    })
+                  }
+                />
+                {label}
+              </label>
+            ))}
+          </div>
+        </fieldset>
 
         <label className="checkbox-row">
           <input
