@@ -1,13 +1,13 @@
 ---
 id: apps-desktop-app
-source: apps/desktop/src/App.tsx
-updated: 2026-08-10
+source: apps/desktop/src/App.tsx, apps/desktop/src/app.css
+updated: 2026-08-11
 depends_on: [apps-desktop-data-db, apps-desktop-data-progress, apps-desktop-data-schedule, apps-desktop-data-locations, apps-desktop-personalized-plan, apps-desktop-location-manager, apps-desktop-exercise-browser]
 status: current
 ---
 
 ## Purpose
-Coordinates desktop database readiness, System shell navigation, first-run setup, saved-plan recovery, and durable workout completion without a router or global store.
+Coordinates desktop database readiness, restrained game-inspired shell styling, navigation, first-run setup, saved-plan recovery, and durable workout completion without a router or global store.
 
 ## Contract
 
@@ -29,12 +29,15 @@ export function App(): ReactNode;
 11. `completeQuest()` captures one `Date`, builds trusted completion metadata from the saved plan day/profile, calls `claimWorkoutCompletion()`, then reloads completion rows from SQLite.
 12. Completion errors update only `completionError`; the saved plan and `PlanView` checklist remain intact.
 
+13. The shell uses a low-contrast charcoal palette, hairline translucent borders, muted blue accents, and restrained state colors. It does not use a grid backdrop, luminous borders, corner brackets, or glow shadows.
+
 ## Invariants
 - The screen state is exactly `plan`, `library`, `locations`, or `profile`.
 - `App` remains the only screen coordinator and completion persistence owner.
 - Progress is derived from loaded completion rows and is never stored separately.
 - There is no independent active-location or quest-cursor state.
 - `ProfileForm` is never rendered with an empty location list.
+- Game hierarchy comes from quest, rank, level, XP, and loadout language rather than neon decoration.
 - First-run setup and recovery do not expose navigation before a valid snapshot exists.
 
 ## Gotchas
