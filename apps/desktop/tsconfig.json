@@ -1,5 +1,9 @@
 {
   "extends": "@flex-state/tsconfig/base.json",
-  "compilerOptions": { "noEmit": true },
-  "include": ["src", "vite.config.ts"]
+  // allowImportingTsExtensions: schedule.ts and locations.ts import each other's
+  // values, and `node --experimental-strip-types` (the test runner) resolves
+  // only explicit specifiers. Vite and tsc both accept the .ts extension.
+  "compilerOptions": { "noEmit": true, "allowImportingTsExtensions": true },
+  "include": ["src", "vite.config.ts"],
+  "exclude": ["src/**/*.test.ts"]
 }
